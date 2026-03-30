@@ -46,3 +46,7 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# AI-related
+CLAUDE.md
+docs/superpowers/
