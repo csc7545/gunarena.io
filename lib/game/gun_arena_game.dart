@@ -1,14 +1,17 @@
 import 'dart:math';
-import 'dart:ui';
 
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gun_arena_io/game/components/bullet_component.dart';
 import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
+import 'package:gun_arena_io/game/models/weapon_config.dart';
 import 'package:gun_arena_io/game/systems/score_system.dart';
 import 'package:gun_arena_io/game/systems/spawn_system.dart';
 
-class GunArenaGame extends FlameGame with HasCollisionDetection {
+class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents {
   late MapComponent mapComponent;
   late PlayerComponent localPlayer;
   late SpawnSystem spawnSystem;
@@ -18,6 +21,11 @@ class GunArenaGame extends FlameGame with HasCollisionDetection {
   final Map<String, PlayerComponent> playerMap = {};
   bool gameEnded = false;
   double _elapsedTime = 0;
+
+  // Keyboard input state
+  final Set<LogicalKeyboardKey> _pressedKeySet = {};
+  bool _isSpaceFiring = false;
+  double _fireAccumulator = 0;
 
   GunArenaGame({int? mapSeed}) : mapSeed = mapSeed ?? Random().nextInt(999999);
 
@@ -48,6 +56,90 @@ class GunArenaGame extends FlameGame with HasCollisionDetection {
   void update(double dt) {
     super.update(dt);
     _elapsedTime += dt;
+    _updateKeyboardInput(dt);
+  }
+
+  void _updateKeyboardInput(double dt) {
+    if (gameEnded) return;
+
+    // WASD movement
+    double dx = 0;
+    double dy = 0;
+    if (_pressedKeySet.contains(LogicalKeyboardKey.keyW) ||
+        _pressedKeySet.contains(LogicalKeyboardKey.arrowUp)) {
+      dy -= 1;
+    }
+    if (_pressedKeySet.contains(LogicalKeyboardKey.keyS) ||
+        _pressedKeySet.contains(LogicalKeyboardKey.arrowDown)) {
+      dy += 1;
+    }
+    if (_pressedKeySet.contains(LogicalKeyboardKey.keyA) ||
+        _pressedKeySet.contains(LogicalKeyboardKey.arrowLeft)) {
+      dx -= 1;
+    }
+    if (_pressedKeySet.contains(LogicalKeyboardKey.keyD) ||
+        _pressedKeySet.contains(LogicalKeyboardKey.arrowRight)) {
+      dx += 1;
+    }
+    localPlayer.moveDirection = Vector2(dx, dy);
+
+    // Space auto-fire
+    if (_isSpaceFiring) {
+      _fireAccumulator += dt;
+      final double fireInterval = 1.0 / WeaponConfig.ar.fireRate;
+      while (_fireAccumulator >= fireInterval) {
+        _fireAccumulator -= fireInterval;
+        shootBullet(localPlayer);
+      }
+    }
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    _pressedKeySet
+      ..clear()
+      ..addAll(keysPressed);
+
+    // Space: fire
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.space &&
+        !_isSpaceFiring) {
+      _isSpaceFiring = true;
+      _fireAccumulator = 0;
+      shootBullet(localPlayer);
+      return KeyEventResult.handled;
+    }
+    if (event is KeyUpEvent && event.logicalKey == LogicalKeyboardKey.space) {
+      _isSpaceFiring = false;
+      _fireAccumulator = 0;
+      return KeyEventResult.handled;
+    }
+
+    // R: reload
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.keyR) {
+      onReload();
+      return KeyEventResult.handled;
+    }
+
+    // Movement keys handled
+    final Set<LogicalKeyboardKey> movementKeySet = {
+      LogicalKeyboardKey.keyW,
+      LogicalKeyboardKey.keyA,
+      LogicalKeyboardKey.keyS,
+      LogicalKeyboardKey.keyD,
+      LogicalKeyboardKey.arrowUp,
+      LogicalKeyboardKey.arrowDown,
+      LogicalKeyboardKey.arrowLeft,
+      LogicalKeyboardKey.arrowRight,
+    };
+    if (movementKeySet.contains(event.logicalKey)) {
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override

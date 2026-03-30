@@ -8,6 +8,7 @@ import 'package:gun_arena_io/presentation/screens/home_screen.dart';
 import 'package:gun_arena_io/presentation/widgets/fire_button_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/hud_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/joystick_overlay.dart';
+import 'package:gun_arena_io/presentation/widgets/key_bindings_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,10 +103,17 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
               FireButtonOverlay(game: game),
           'hud': (BuildContext context, GunArenaGame game) =>
               HudOverlay(game: game),
+          'keyBindings': (BuildContext context, GunArenaGame game) =>
+              KeyBindingsOverlay(game: game),
           'gameEnd': (BuildContext context, GunArenaGame game) =>
               _buildGameEndOverlay(game),
         },
-        initialActiveOverlays: const ['joystick', 'fireButton', 'hud'],
+        initialActiveOverlays: const [
+          'joystick',
+          'fireButton',
+          'hud',
+          'keyBindings',
+        ],
       ),
     );
   }
