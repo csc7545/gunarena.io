@@ -97,8 +97,8 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GameWidget.controlled(
-        gameFactory: () => _game,
+      body: GameWidget(
+        game: _game,
         overlayBuilderMap: {
           'fireButton': (BuildContext context, GunArenaGame game) =>
               FireButtonOverlay(game: game),
