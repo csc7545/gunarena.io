@@ -180,6 +180,11 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
     world.add(bullet);
   }
 
+  void onJoystickMove(double dx, double dy) {
+    if (gameEnded) return;
+    localPlayer.moveDirection = Vector2(dx, dy);
+  }
+
   void onFire() {
     if (gameEnded) return;
     shootBullet(localPlayer);
