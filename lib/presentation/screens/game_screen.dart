@@ -100,6 +100,8 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   void dispose() {
+    _game.pauseEngine();
+    _game.removeAll(_game.children);
     _stateSync?.dispose();
     _rtcManager.dispose();
     widget.signaling.dispose();
@@ -118,8 +120,8 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return Scaffold(
-      body: GameWidget(
-        game: _game,
+      body: GameWidget.controlled(
+        gameFactory: () => _game,
         overlayBuilderMap: {
           'fireButton': (BuildContext context, GunArenaGame game) =>
               FireButtonOverlay(game: game),

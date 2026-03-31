@@ -88,10 +88,17 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
   }
 
   @override
+  void dispose() {
+    _game.pauseEngine();
+    _game.removeAll(_game.children);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GameWidget(
-        game: _game,
+      body: GameWidget.controlled(
+        gameFactory: () => _game,
         overlayBuilderMap: {
           'fireButton': (BuildContext context, GunArenaGame game) =>
               FireButtonOverlay(game: game),
