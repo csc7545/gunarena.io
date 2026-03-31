@@ -51,11 +51,11 @@ class _HudOverlayState extends State<HudOverlay> {
             child: _buildHpBar(player),
           ),
 
-          // Top right: Kill count
+          // Top right: Leaderboard
           Positioned(
             top: 12,
             right: 12,
-            child: _buildKillCount(player),
+            child: _buildLeaderboard(),
           ),
 
           // Top center: Kill log
@@ -122,20 +122,94 @@ class _HudOverlayState extends State<HudOverlay> {
     );
   }
 
-  Widget _buildKillCount(PlayerComponent player) {
+  Widget _buildLeaderboard() {
+    final List<PlayerComponent> sortedPlayerList =
+        game.playerMap.values.toList()
+          ..sort((PlayerComponent a, PlayerComponent b) {
+            if (b.kills != a.kills) return b.kills.compareTo(a.kills);
+            return a.deaths.compareTo(b.deaths);
+          });
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: const Color(0xAA000000),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        '${player.kills} / ${ScoreSystem.targetKills}',
-        style: const TextStyle(
-          color: Color(0xFFFFFFFF),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'LEADERBOARD',
+                style: TextStyle(
+                  color: Color(0xFFFFC107),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'First to ${ScoreSystem.targetKills}',
+                style: const TextStyle(
+                  color: Color(0x99FFFFFF),
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ...sortedPlayerList.map((PlayerComponent p) {
+            final bool isLocal = p.playerId == 'local';
+            final String name = _playerDisplayName(p.playerId);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 3),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(p.color.toARGB32()),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    width: 60,
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        color: isLocal
+                            ? const Color(0xFF4CAF50)
+                            : const Color(0xFFFFFFFF),
+                        fontSize: 12,
+                        fontWeight:
+                            isLocal ? FontWeight.bold : FontWeight.normal,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${p.kills}K / ${p.deaths}D',
+                    style: TextStyle(
+                      color: isLocal
+                          ? const Color(0xFF4CAF50)
+                          : const Color(0xCCFFFFFF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

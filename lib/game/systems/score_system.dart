@@ -15,7 +15,7 @@ class KillEvent {
 }
 
 class ScoreSystem extends Component with HasGameReference<GunArenaGame> {
-  static const int targetKills = 15;
+  static const int targetKills = 10;
   final List<KillEvent> killEventList = [];
   String? winnerId;
 
