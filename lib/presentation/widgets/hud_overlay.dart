@@ -179,19 +179,15 @@ class _HudOverlayState extends State<HudOverlay> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  SizedBox(
-                    width: 60,
-                    child: Text(
-                      name,
-                      style: TextStyle(
-                        color: isLocal
-                            ? const Color(0xFF4CAF50)
-                            : const Color(0xFFFFFFFF),
-                        fontSize: 12,
-                        fontWeight:
-                            isLocal ? FontWeight.bold : FontWeight.normal,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: isLocal
+                          ? const Color(0xFF4CAF50)
+                          : const Color(0xFFFFFFFF),
+                      fontSize: 12,
+                      fontWeight:
+                          isLocal ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   const SizedBox(width: 8),
