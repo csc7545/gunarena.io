@@ -73,21 +73,18 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _game = GunArenaGame();
-    _spawnAiPlayers();
+    _game = GunArenaGame(onReady: _spawnAiPlayers);
   }
 
   void _spawnAiPlayers() {
-    _game.onLoad().then((_) {
-      for (int i = 0; i < 3; i++) {
-        final AiPlayerComponent ai = AiPlayerComponent(
-          playerId: 'ai_$i',
-          position: _game.spawnSystem.findSafeSpawnPosition(),
-          color: aiColorList[i],
-        );
-        _game.addPlayer(ai);
-      }
-    });
+    for (int i = 0; i < 3; i++) {
+      final AiPlayerComponent ai = AiPlayerComponent(
+        playerId: 'ai_$i',
+        position: _game.spawnSystem.findSafeSpawnPosition(),
+        color: aiColorList[i],
+      );
+      _game.addPlayer(ai);
+    }
   }
 
   @override

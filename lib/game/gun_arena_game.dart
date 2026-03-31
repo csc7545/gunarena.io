@@ -18,6 +18,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   late ScoreSystem scoreSystem;
 
   final int mapSeed;
+  final VoidCallback? onReady;
   final Map<String, PlayerComponent> playerMap = {};
   bool gameEnded = false;
   double _elapsedTime = 0;
@@ -27,7 +28,8 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   bool _isSpaceFiring = false;
   double _fireAccumulator = 0;
 
-  GunArenaGame({int? mapSeed}) : mapSeed = mapSeed ?? Random().nextInt(999999);
+  GunArenaGame({int? mapSeed, this.onReady})
+      : mapSeed = mapSeed ?? Random().nextInt(999999);
 
   @override
   Future<void> onLoad() async {
@@ -50,6 +52,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
     playerMap['local'] = localPlayer;
 
     camera.follow(localPlayer);
+    onReady?.call();
   }
 
   @override
