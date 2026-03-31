@@ -47,8 +47,6 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
         _isPressed(LogicalKeyboardKey.arrowDown);
     final bool dPressed = _isPressed(LogicalKeyboardKey.keyD) ||
         _isPressed(LogicalKeyboardKey.arrowRight);
-    final bool spacePressed = _isPressed(LogicalKeyboardKey.space);
-    final bool rPressed = _isPressed(LogicalKeyboardKey.keyR);
 
     return Positioned(
       bottom: 24,
@@ -63,15 +61,11 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // W key
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildKey('W', wPressed),
-              ],
+              children: [_buildKey('W', wPressed)],
             ),
             const SizedBox(height: 4),
-            // A S D keys
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -82,21 +76,15 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
                 _buildKey('D', dPressed),
               ],
             ),
-            const SizedBox(height: 8),
-            // Space bar
-            _buildKey('SPACE', spacePressed, width: 120),
-            const SizedBox(height: 4),
-            // R key
-            _buildKey('R', rPressed),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildKey(String label, bool pressed, {double? width}) {
+  Widget _buildKey(String label, bool pressed) {
     return Container(
-      width: width ?? 36,
+      width: 36,
       height: 36,
       decoration: BoxDecoration(
         color: pressed ? const Color(0xFF4CAF50) : const Color(0x33FFFFFF),
@@ -120,7 +108,7 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
           label,
           style: TextStyle(
             color: pressed ? const Color(0xFFFFFFFF) : const Color(0x99FFFFFF),
-            fontSize: label.length > 1 ? 10 : 14,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             fontFamily: 'monospace',
             decoration: TextDecoration.none,
