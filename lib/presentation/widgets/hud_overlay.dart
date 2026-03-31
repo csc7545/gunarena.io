@@ -52,19 +52,19 @@ class _HudOverlayState extends State<HudOverlay> {
               child: _buildHpBar(player),
             ),
 
-            // Top right: Leaderboard
+            // Top right: Leaderboard + Kill log
             Positioned(
               top: 12,
               right: 12,
-              child: _buildLeaderboard(),
-            ),
-
-            // Top center: Kill log
-            Positioned(
-              top: 12,
-              left: 0,
-              right: 0,
-              child: _buildKillLog(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildLeaderboard(),
+                  const SizedBox(height: 8),
+                  _buildKillLog(),
+                ],
+              ),
             ),
 
             // Death overlay
