@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
 
@@ -44,12 +45,14 @@ class _FireButtonOverlayState extends State<FireButtonOverlay> {
   Widget build(BuildContext context) {
     final bool spacePressed = _isKeyPressed(LogicalKeyboardKey.space);
     final bool rPressed = _isKeyPressed(LogicalKeyboardKey.keyR);
+    final PlayerComponent player = widget.game.localPlayer;
 
     return Positioned(
       right: 30,
       bottom: 30,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           // Reload button + R key indicator
           Row(
@@ -113,8 +116,43 @@ class _FireButtonOverlayState extends State<FireButtonOverlay> {
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          // Ammo display
+          _buildAmmoDisplay(player),
         ],
       ),
+    );
+  }
+
+  Widget _buildAmmoDisplay(PlayerComponent player) {
+    final bool isReloading = player.isReloading;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xAA000000),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: isReloading
+          ? const Text(
+              'RELOADING',
+              style: TextStyle(
+                color: Color(0xFFFFC107),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none,
+              ),
+            )
+          : Text(
+              '${player.ammo} / ${WeaponConfig.ar.magazineSize}',
+              style: TextStyle(
+                color: player.ammo <= 5
+                    ? const Color(0xFFF44336)
+                    : const Color(0xFFFFFFFF),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.none,
+              ),
+            ),
     );
   }
 

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
-import 'package:gun_arena_io/game/models/weapon_config.dart';
 import 'package:gun_arena_io/game/systems/score_system.dart';
 
 class HudOverlay extends StatefulWidget {
@@ -65,13 +64,6 @@ class _HudOverlayState extends State<HudOverlay> {
             left: 0,
             right: 0,
             child: _buildKillLog(),
-          ),
-
-          // Bottom center-right: Ammo display
-          Positioned(
-            bottom: 24,
-            right: 100,
-            child: _buildAmmoDisplay(player),
           ),
 
           // Death overlay
@@ -185,37 +177,6 @@ class _HudOverlayState extends State<HudOverlay> {
           ),
         );
       }).toList(),
-    );
-  }
-
-  Widget _buildAmmoDisplay(PlayerComponent player) {
-    final bool isReloading = player.isReloading;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xAA000000),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: isReloading
-          ? const Text(
-              'RELOADING',
-              style: TextStyle(
-                color: Color(0xFFFFC107),
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          : Text(
-              '${player.ammo} / ${WeaponConfig.ar.magazineSize}',
-              style: TextStyle(
-                color: player.ammo <= 5
-                    ? const Color(0xFFF44336)
-                    : const Color(0xFFFFFFFF),
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
     );
   }
 
