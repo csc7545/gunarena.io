@@ -47,6 +47,11 @@ app.*.map.json
 # FVM Version Cache
 .fvm/
 
+# Firebase
+.firebaserc
+firebase.json
+.firebase/
+
 # AI-related
 CLAUDE.md
 docs/superpowers/
