@@ -8,7 +8,6 @@ import 'package:gun_arena_io/network/webrtc/data_channel.dart';
 import 'package:gun_arena_io/network/webrtc/rtc_manager.dart';
 import 'package:gun_arena_io/presentation/widgets/fire_button_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/hud_overlay.dart';
-import 'package:gun_arena_io/presentation/widgets/joystick_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/key_bindings_overlay.dart';
 
 class GameScreen extends StatefulWidget {
@@ -122,8 +121,6 @@ class _GameScreenState extends State<GameScreen> {
       body: GameWidget(
         game: _game,
         overlayBuilderMap: {
-          'joystick': (BuildContext context, GunArenaGame game) =>
-              JoystickOverlay(game: game),
           'fireButton': (BuildContext context, GunArenaGame game) =>
               FireButtonOverlay(game: game),
           'hud': (BuildContext context, GunArenaGame game) =>
@@ -134,7 +131,6 @@ class _GameScreenState extends State<GameScreen> {
               _buildGameEndOverlay(game),
         },
         initialActiveOverlays: const [
-          'joystick',
           'fireButton',
           'hud',
           'keyBindings',

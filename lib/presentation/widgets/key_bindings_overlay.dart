@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 
 class KeyBindingsOverlay extends StatefulWidget {
@@ -11,94 +14,118 @@ class KeyBindingsOverlay extends StatefulWidget {
 }
 
 class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
-  bool _visible = true;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
-    // 5초 후 자동으로 숨김
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) setState(() => _visible = false);
-    });
+    _refreshTimer = Timer.periodic(
+      const Duration(milliseconds: 50),
+      (_) {
+        if (mounted) setState(() {});
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  bool _isPressed(LogicalKeyboardKey key) {
+    return widget.game.pressedKeySet.contains(key);
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool wPressed = _isPressed(LogicalKeyboardKey.keyW) ||
+        _isPressed(LogicalKeyboardKey.arrowUp);
+    final bool aPressed = _isPressed(LogicalKeyboardKey.keyA) ||
+        _isPressed(LogicalKeyboardKey.arrowLeft);
+    final bool sPressed = _isPressed(LogicalKeyboardKey.keyS) ||
+        _isPressed(LogicalKeyboardKey.arrowDown);
+    final bool dPressed = _isPressed(LogicalKeyboardKey.keyD) ||
+        _isPressed(LogicalKeyboardKey.arrowRight);
+    final bool spacePressed = _isPressed(LogicalKeyboardKey.space);
+    final bool rPressed = _isPressed(LogicalKeyboardKey.keyR);
+
     return Positioned(
-      bottom: 120,
-      left: 12,
-      child: AnimatedOpacity(
-        opacity: _visible ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 500),
-        child: GestureDetector(
-          onTap: () => setState(() => _visible = !_visible),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xCC000000),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      bottom: 24,
+      left: 24,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xAA000000),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // W key
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'CONTROLS',
-                  style: TextStyle(
-                    color: Color(0xFFFFC107),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildKeyRow('W A S D', 'Move'),
-                _buildKeyRow('Arrow Keys', 'Move'),
-                _buildKeyRow('Space', 'Fire'),
-                _buildKeyRow('R', 'Reload'),
+                _buildKey('W', wPressed),
               ],
             ),
-          ),
+            const SizedBox(height: 4),
+            // A S D keys
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildKey('A', aPressed),
+                const SizedBox(width: 4),
+                _buildKey('S', sPressed),
+                const SizedBox(width: 4),
+                _buildKey('D', dPressed),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Space bar
+            _buildKey('SPACE', spacePressed, width: 120),
+            const SizedBox(height: 4),
+            // R key
+            _buildKey('R', rPressed),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildKeyRow(String key, String action) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0x44FFFFFF),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0x66FFFFFF)),
-            ),
-            child: Text(
-              key,
-              style: const TextStyle(
-                color: Color(0xFFFFFFFF),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'monospace',
-                decoration: TextDecoration.none,
-              ),
-            ),
+  Widget _buildKey(String label, bool pressed, {double? width}) {
+    return Container(
+      width: width ?? 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: pressed ? const Color(0xFF4CAF50) : const Color(0x33FFFFFF),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: pressed ? const Color(0xFF66BB6A) : const Color(0x55FFFFFF),
+          width: pressed ? 2 : 1,
+        ),
+        boxShadow: pressed
+            ? [
+                const BoxShadow(
+                  color: Color(0x664CAF50),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: TextStyle(
+            color: pressed ? const Color(0xFFFFFFFF) : const Color(0x99FFFFFF),
+            fontSize: label.length > 1 ? 10 : 14,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'monospace',
+            decoration: TextDecoration.none,
           ),
-          const SizedBox(width: 8),
-          Text(
-            action,
-            style: const TextStyle(
-              color: Color(0xAAFFFFFF),
-              fontSize: 11,
-              decoration: TextDecoration.none,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

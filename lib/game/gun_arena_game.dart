@@ -23,7 +23,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   double _elapsedTime = 0;
 
   // Keyboard input state
-  final Set<LogicalKeyboardKey> _pressedKeySet = {};
+  final Set<LogicalKeyboardKey> pressedKeySet = {};
   bool _isSpaceFiring = false;
   double _fireAccumulator = 0;
 
@@ -65,20 +65,20 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
     // WASD movement
     double dx = 0;
     double dy = 0;
-    if (_pressedKeySet.contains(LogicalKeyboardKey.keyW) ||
-        _pressedKeySet.contains(LogicalKeyboardKey.arrowUp)) {
+    if (pressedKeySet.contains(LogicalKeyboardKey.keyW) ||
+        pressedKeySet.contains(LogicalKeyboardKey.arrowUp)) {
       dy -= 1;
     }
-    if (_pressedKeySet.contains(LogicalKeyboardKey.keyS) ||
-        _pressedKeySet.contains(LogicalKeyboardKey.arrowDown)) {
+    if (pressedKeySet.contains(LogicalKeyboardKey.keyS) ||
+        pressedKeySet.contains(LogicalKeyboardKey.arrowDown)) {
       dy += 1;
     }
-    if (_pressedKeySet.contains(LogicalKeyboardKey.keyA) ||
-        _pressedKeySet.contains(LogicalKeyboardKey.arrowLeft)) {
+    if (pressedKeySet.contains(LogicalKeyboardKey.keyA) ||
+        pressedKeySet.contains(LogicalKeyboardKey.arrowLeft)) {
       dx -= 1;
     }
-    if (_pressedKeySet.contains(LogicalKeyboardKey.keyD) ||
-        _pressedKeySet.contains(LogicalKeyboardKey.arrowRight)) {
+    if (pressedKeySet.contains(LogicalKeyboardKey.keyD) ||
+        pressedKeySet.contains(LogicalKeyboardKey.arrowRight)) {
       dx += 1;
     }
     localPlayer.moveDirection = Vector2(dx, dy);
@@ -99,7 +99,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
     KeyEvent event,
     Set<LogicalKeyboardKey> keysPressed,
   ) {
-    _pressedKeySet
+    pressedKeySet
       ..clear()
       ..addAll(keysPressed);
 
@@ -175,11 +175,6 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
       direction: player.facingDirection.normalized(),
     );
     add(bullet);
-  }
-
-  void onJoystickMove(double dx, double dy) {
-    if (gameEnded) return;
-    localPlayer.moveDirection = Vector2(dx, dy);
   }
 
   void onFire() {

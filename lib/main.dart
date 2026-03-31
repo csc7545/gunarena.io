@@ -7,7 +7,6 @@ import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/presentation/screens/home_screen.dart';
 import 'package:gun_arena_io/presentation/widgets/fire_button_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/hud_overlay.dart';
-import 'package:gun_arena_io/presentation/widgets/joystick_overlay.dart';
 import 'package:gun_arena_io/presentation/widgets/key_bindings_overlay.dart';
 
 void main() async {
@@ -97,8 +96,6 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
       body: GameWidget(
         game: _game,
         overlayBuilderMap: {
-          'joystick': (BuildContext context, GunArenaGame game) =>
-              JoystickOverlay(game: game),
           'fireButton': (BuildContext context, GunArenaGame game) =>
               FireButtonOverlay(game: game),
           'hud': (BuildContext context, GunArenaGame game) =>
@@ -109,7 +106,6 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
               _buildGameEndOverlay(game),
         },
         initialActiveOverlays: const [
-          'joystick',
           'fireButton',
           'hud',
           'keyBindings',
