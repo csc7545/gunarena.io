@@ -167,41 +167,48 @@ class _HudOverlayState extends State<HudOverlay> {
             final String name = _playerDisplayName(p.playerId);
             return Padding(
               padding: const EdgeInsets.only(bottom: 3),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(p.color.toARGB32()),
+              child: SizedBox(
+                width: 150,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(p.color.toARGB32()),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            color: isLocal
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFFFFFFFF),
+                            fontSize: 12,
+                            fontWeight:
+                                isLocal ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: isLocal
-                          ? const Color(0xFF4CAF50)
-                          : const Color(0xFFFFFFFF),
-                      fontSize: 12,
-                      fontWeight:
-                          isLocal ? FontWeight.bold : FontWeight.normal,
+                    Text(
+                      '${p.kills}K / ${p.deaths}D',
+                      style: TextStyle(
+                        color: isLocal
+                            ? const Color(0xFF4CAF50)
+                            : const Color(0xCCFFFFFF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${p.kills}K / ${p.deaths}D',
-                    style: TextStyle(
-                      color: isLocal
-                          ? const Color(0xFF4CAF50)
-                          : const Color(0xCCFFFFFF),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }),
