@@ -98,6 +98,7 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GameWidget(
+        key: ValueKey(_game.hashCode),
         game: _game,
         overlayBuilderMap: {
           'fireButton': (BuildContext context, GunArenaGame game) =>

@@ -121,6 +121,7 @@ class _GameScreenState extends State<GameScreen> {
 
     return Scaffold(
       body: GameWidget(
+        key: ValueKey(_game.hashCode),
         game: _game,
         overlayBuilderMap: {
           'fireButton': (BuildContext context, GunArenaGame game) =>

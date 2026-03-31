@@ -51,7 +51,8 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
     return Positioned(
       bottom: 24,
       left: 24,
-      child: Container(
+      child: IgnorePointer(
+        child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: const Color(0xAA000000),
@@ -78,6 +79,7 @@ class _KeyBindingsOverlayState extends State<KeyBindingsOverlay> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -41,34 +41,36 @@ class _HudOverlayState extends State<HudOverlay> {
     final PlayerComponent player = game.localPlayer;
     final bool isDead = !player.alive;
 
-    return SafeArea(
-      child: Stack(
-        children: [
-          // Top left: HP bar
-          Positioned(
-            top: 12,
-            left: 12,
-            child: _buildHpBar(player),
-          ),
+    return IgnorePointer(
+      child: SafeArea(
+        child: Stack(
+          children: [
+            // Top left: HP bar
+            Positioned(
+              top: 12,
+              left: 12,
+              child: _buildHpBar(player),
+            ),
 
-          // Top right: Leaderboard
-          Positioned(
-            top: 12,
-            right: 12,
-            child: _buildLeaderboard(),
-          ),
+            // Top right: Leaderboard
+            Positioned(
+              top: 12,
+              right: 12,
+              child: _buildLeaderboard(),
+            ),
 
-          // Top center: Kill log
-          Positioned(
-            top: 12,
-            left: 0,
-            right: 0,
-            child: _buildKillLog(),
-          ),
+            // Top center: Kill log
+            Positioned(
+              top: 12,
+              left: 0,
+              right: 0,
+              child: _buildKillLog(),
+            ),
 
-          // Death overlay
-          if (isDead) _buildDeathOverlay(player),
-        ],
+            // Death overlay
+            if (isDead) _buildDeathOverlay(player),
+          ],
+        ),
       ),
     );
   }
