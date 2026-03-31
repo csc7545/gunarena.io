@@ -34,13 +34,13 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   @override
   Future<void> onLoad() async {
     mapComponent = MapComponent(seed: mapSeed);
-    await add(mapComponent);
+    await world.add(mapComponent);
 
     spawnSystem = SpawnSystem();
-    await add(spawnSystem);
+    await world.add(spawnSystem);
 
     scoreSystem = ScoreSystem();
-    await add(scoreSystem);
+    await world.add(scoreSystem);
 
     final Vector2 spawnPos = _findSafeSpawnPosition();
     localPlayer = PlayerComponent(
@@ -48,7 +48,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
       position: spawnPos,
       color: const Color(0xFF4CAF50),
     );
-    await add(localPlayer);
+    await world.add(localPlayer);
     playerMap['local'] = localPlayer;
 
     camera.follow(localPlayer);
@@ -177,7 +177,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
       position: bulletPos.clone(),
       direction: player.facingDirection.normalized(),
     );
-    add(bullet);
+    world.add(bullet);
   }
 
   void onFire() {
@@ -219,6 +219,6 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
 
   void addPlayer(PlayerComponent player) {
     playerMap[player.playerId] = player;
-    add(player);
+    world.add(player);
   }
 }

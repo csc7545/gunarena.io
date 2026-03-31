@@ -90,7 +90,7 @@ class _SinglePlayerScreenState extends State<SinglePlayerScreen> {
   @override
   void dispose() {
     _game.pauseEngine();
-    _game.removeAll(_game.children);
+    _game.world.removeAll(_game.world.children);
     super.dispose();
   }
 

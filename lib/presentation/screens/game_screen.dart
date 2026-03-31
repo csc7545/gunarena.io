@@ -101,7 +101,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _game.pauseEngine();
-    _game.removeAll(_game.children);
+    _game.world.removeAll(_game.world.children);
     _stateSync?.dispose();
     _rtcManager.dispose();
     widget.signaling.dispose();
