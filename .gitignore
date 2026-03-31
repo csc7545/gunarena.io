@@ -51,6 +51,7 @@ app.*.map.json
 .firebaserc
 firebase.json
 .firebase/
+lib/firebase_options.dart
 
 # AI-related
 CLAUDE.md
