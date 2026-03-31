@@ -2,18 +2,21 @@
 
 **GunArena.io** is a fast-paced multiplayer top-down shooter built with [Flutter](https://flutter.dev/), [Flame](https://flame-engine.org/), and WebRTC.
 
-Share a link, join the arena, and be the first to 15 kills!
+Share a link, join the arena, and be the first to 10 kills!
+
+> **Play now:** [https://gun-arena-io.web.app](https://gun-arena-io.web.app)
 
 <br>
 
 ## 🎮 Game Features
 
 - 🔫 Real-time PvP combat (2–4 players) via WebRTC DataChannel
-- 🗺️ 1024x1024 map with seed-based randomized obstacles
+- 🗺️ 1920x1024 wide arena with seed-based randomized obstacles (35-50)
 - ❤️ HP system (100HP, 7-shot kill) with 5s respawn + 2s invincibility
-- 🎯 Virtual joystick + fire button controls
+- ⌨️ Keyboard controls (WASD/Arrow + Space + R) with real-time key visualizer
+- 🏆 Live leaderboard with K/D tracking — first to 10 kills wins
 - 🔄 Flame-based collision detection and rendering
-- 🤖 Singleplayer mode with AI bots
+- 🤖 Singleplayer mode with 3 AI bots
 - 🔗 Link-sharing room system (no account required)
 
 <br>
@@ -55,12 +58,12 @@ fvm flutter run -d chrome --web-hostname=localhost --web-port=3000
 
 ## 🎮 Controls
 
-| Action | Control |
-|--------|---------|
-| Move | Left joystick (drag) |
-| Aim | Movement direction = aim direction |
-| Shoot | Right fire button (hold for auto-fire) |
-| Reload | Reload button (or auto when empty) |
+| Action | Keyboard | Mouse/Touch |
+|--------|----------|-------------|
+| Move | `W` `A` `S` `D` / Arrow keys | — |
+| Aim | Movement direction = aim direction | — |
+| Shoot | `Space` (hold for auto-fire) | Fire button |
+| Reload | `R` | Reload button |
 
 <br>
 
@@ -94,7 +97,7 @@ lib/
 │   └── room/          # Room lifecycle management
 └── presentation/      # UI
     ├── screens/       # Home, Lobby, Game, Result
-    └── widgets/       # Joystick, Fire button, HUD
+    └── widgets/       # Key visualizer, Fire button, HUD
 ```
 
 **Networking**: Host-client model over WebRTC. Host runs the simulation and broadcasts state at 20Hz. Clients send input only. Firebase Firestore handles WebRTC signaling (offer/answer/ICE exchange).
@@ -106,9 +109,9 @@ lib/
 - [ ] Weapon switching
 - [ ] Player skin customization
 - [ ] Spectator mode
-- [ ] Live leaderboard with Firebase
 - [ ] Field-of-view fog (visibility limitation)
 - [ ] Host migration
+- [ ] Mobile touch controls (joystick)
 
 <br>
 
