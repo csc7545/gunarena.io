@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/obstacle_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
@@ -47,9 +48,9 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
 
     if (traveledDistance >= maxRange ||
         position.x < 0 ||
-        position.x > 1024 ||
+        position.x > MapComponent.mapWidth ||
         position.y < 0 ||
-        position.y > 1024) {
+        position.y > MapComponent.mapHeight) {
       removeFromParent();
     }
   }

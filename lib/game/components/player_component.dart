@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/obstacle_component.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
 
@@ -71,8 +72,8 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       final Vector2 movement = normalized * playerSpeed * dt;
       final Vector2 newPos = position + movement;
 
-      newPos.x = newPos.x.clamp(playerRadius, 1024.0 - playerRadius);
-      newPos.y = newPos.y.clamp(playerRadius, 1024.0 - playerRadius);
+      newPos.x = newPos.x.clamp(playerRadius, MapComponent.mapWidth - playerRadius);
+      newPos.y = newPos.y.clamp(playerRadius, MapComponent.mapHeight - playerRadius);
 
       position.setFrom(newPos);
     }

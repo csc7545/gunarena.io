@@ -151,8 +151,8 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   Vector2 _findSafeSpawnPosition() {
     final Random random = Random();
     for (int i = 0; i < 100; i++) {
-      final double x = 50 + random.nextDouble() * (1024 - 100);
-      final double y = 50 + random.nextDouble() * (1024 - 100);
+      final double x = 50 + random.nextDouble() * (MapComponent.mapWidth - 100);
+      final double y = 50 + random.nextDouble() * (MapComponent.mapHeight - 100);
       bool safe = true;
       for (final Rect rect in mapComponent.obstacleRectList) {
         if (rect.inflate(20).contains(Offset(x, y))) {
@@ -162,7 +162,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
       }
       if (safe) return Vector2(x, y);
     }
-    return Vector2(512, 512);
+    return Vector2(MapComponent.mapWidth / 2, MapComponent.mapHeight / 2);
   }
 
   void shootBullet(PlayerComponent player) {
