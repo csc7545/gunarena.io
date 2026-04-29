@@ -50,6 +50,7 @@ app.*.map.json
 # Firebase
 .firebaserc
 firebase.json
+firestore.rules
 .firebase/
 lib/firebase_options.dart
 
