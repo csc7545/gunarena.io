@@ -18,6 +18,11 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RoomCubit, RoomState>(
+      listenWhen: (RoomState previous, RoomState current) {
+        // Only navigate to game on the initial Waiting → Starting transition.
+        if (current is RoomStarting) return previous is RoomWaiting;
+        return true;
+      },
       listener: (BuildContext context, RoomState state) {
         if (state is RoomStarting) {
           Navigator.of(context).pushReplacement(
@@ -25,6 +30,7 @@ class LobbyScreen extends StatelessWidget {
               builder: (_) => GameScreen(
                 roomId: state.roomId,
                 isHost: state.isHost,
+                mapSeed: state.mapSeed,
                 signaling: context.read<RoomCubit>().signaling,
               ),
             ),

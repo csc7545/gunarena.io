@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame/components.dart' show Vector2;
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/network/protocol/message.dart';
@@ -21,16 +22,27 @@ class StateSync {
   });
 
   void start() {
+    final int intervalMs = (1000 / tickRate).round();
     if (isHost) {
-      _startHostBroadcast();
+      _broadcastTimer = Timer.periodic(
+        Duration(milliseconds: intervalMs),
+        (_) => _broadcastGameState(),
+      );
+    } else {
+      _broadcastTimer = Timer.periodic(
+        Duration(milliseconds: intervalMs),
+        (_) => _sendLocalInput(),
+      );
     }
   }
 
-  void _startHostBroadcast() {
-    final int intervalMs = (1000 / tickRate).round();
-    _broadcastTimer = Timer.periodic(
-      Duration(milliseconds: intervalMs),
-      (_) => _broadcastGameState(),
+  void _sendLocalInput() {
+    final PlayerComponent p = game.localPlayer;
+    sendInput(
+      dx: p.moveDirection.x,
+      dy: p.moveDirection.y,
+      firing: game.isLocalFiring,
+      reloading: false,
     );
   }
 
@@ -113,25 +125,33 @@ class StateSync {
     for (final dynamic playerData in playerList) {
       final Map<String, dynamic> p = playerData as Map<String, dynamic>;
       final String id = p['id'] as String;
-      final PlayerComponent? player = game.findPlayer(id);
+      final double x = (p['x'] as num).toDouble();
+      final double y = (p['y'] as num).toDouble();
 
-      if (player != null) {
-        player.position.setValues(
-          (p['x'] as num).toDouble(),
-          (p['y'] as num).toDouble(),
+      PlayerComponent? player = game.findPlayer(id);
+
+      if (player == null) {
+        // Spawn unknown remote player from host state.
+        player = PlayerComponent(
+          playerId: id,
+          position: Vector2(x, y),
+          color: GunArenaGame.colorForPlayer(id),
         );
-        player.hp = p['hp'] as int;
-        player.kills = p['k'] as int;
-        player.deaths = p['d'] as int;
-        player.alive = p['a'] as bool;
-        player.ammo = p['am'] as int;
-        player.isReloading = p['rl'] as bool;
-        player.isInvincible = p['iv'] as bool;
-        player.facingDirection.setValues(
-          (p['fx'] as num).toDouble(),
-          (p['fy'] as num).toDouble(),
-        );
+        game.addPlayer(player);
       }
+
+      player.position.setValues(x, y);
+      player.hp = p['hp'] as int;
+      player.kills = p['k'] as int;
+      player.deaths = p['d'] as int;
+      player.alive = p['a'] as bool;
+      player.ammo = p['am'] as int;
+      player.isReloading = p['rl'] as bool;
+      player.isInvincible = p['iv'] as bool;
+      player.facingDirection.setValues(
+        (p['fx'] as num).toDouble(),
+        (p['fy'] as num).toDouble(),
+      );
     }
   }
 

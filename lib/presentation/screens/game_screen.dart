@@ -14,12 +14,14 @@ import 'package:gun_arena_io/presentation/widgets/key_bindings_overlay.dart';
 class GameScreen extends StatefulWidget {
   final String roomId;
   final bool isHost;
+  final int mapSeed;
   final FirebaseSignaling signaling;
 
   const GameScreen({
     super.key,
     required this.roomId,
     required this.isHost,
+    required this.mapSeed,
     required this.signaling,
   });
 
@@ -33,17 +35,13 @@ class _GameScreenState extends State<GameScreen> {
   StateSync? _stateSync;
   bool _initialized = false;
 
-  static const List<Color> playerColorList = [
-    Color(0xFF4CAF50),
-    Color(0xFFF44336),
-    Color(0xFF2196F3),
-    Color(0xFFFF9800),
-  ];
-
   @override
   void initState() {
     super.initState();
-    _game = GunArenaGame();
+    _game = GunArenaGame(
+      localId: widget.signaling.localId,
+      mapSeed: widget.mapSeed,
+    );
     _rtcManager = RtcManager(
       signaling: widget.signaling,
       onChannelOpen: _onChannelOpen,
@@ -63,8 +61,13 @@ class _GameScreenState extends State<GameScreen> {
       isHost: widget.isHost,
     );
 
+    _stateSync!.start();
     if (widget.isHost) {
-      _stateSync!.start();
+      // Initiate WebRTC offers to every other player in the room.
+      final List<String> peerIdList = await widget.signaling.getPeerIds();
+      for (final String peerId in peerIdList) {
+        await _rtcManager.createOffer(peerId);
+      }
     }
 
     setState(() => _initialized = true);
@@ -72,14 +75,11 @@ class _GameScreenState extends State<GameScreen> {
 
   void _onChannelOpen(String peerId, GameDataChannel channel) {
     if (widget.isHost) {
-      final int playerIndex = _game.playerMap.length;
-      final Color color = playerColorList[playerIndex % playerColorList.length];
       final Vector2 pos = _game.spawnSystem.findSafeSpawnPosition();
-
       final PlayerComponent remotePlayer = PlayerComponent(
         playerId: peerId,
         position: pos,
-        color: color,
+        color: GunArenaGame.colorForPlayer(peerId),
       );
       _game.addPlayer(remotePlayer);
     }

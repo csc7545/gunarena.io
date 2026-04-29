@@ -40,11 +40,16 @@ class RoomWaiting extends RoomState {
 class RoomStarting extends RoomState {
   final String roomId;
   final bool isHost;
+  final int mapSeed;
 
-  const RoomStarting({required this.roomId, required this.isHost});
+  const RoomStarting({
+    required this.roomId,
+    required this.isHost,
+    required this.mapSeed,
+  });
 
   @override
-  List<Object?> get props => [roomId, isHost];
+  List<Object?> get props => [roomId, isHost, mapSeed];
 }
 
 class RoomError extends RoomState {

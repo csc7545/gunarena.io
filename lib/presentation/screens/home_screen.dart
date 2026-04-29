@@ -33,9 +33,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocProvider(
       create: (_) => RoomCubit(signaling: FirebaseSignaling()),
       child: BlocConsumer<RoomCubit, RoomState>(
+        listenWhen: (RoomState previous, RoomState current) {
+          // Only navigate to lobby on the initial entry (Creating → Waiting),
+          // not on subsequent player-list updates that re-emit RoomWaiting.
+          if (current is RoomWaiting) return previous is RoomCreating;
+          return true;
+        },
         listener: (BuildContext context, RoomState state) {
           if (state is RoomWaiting) {
-            Navigator.of(context).pushReplacement(
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => BlocProvider.value(
                   value: context.read<RoomCubit>(),

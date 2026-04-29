@@ -17,6 +17,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   late SpawnSystem spawnSystem;
   late ScoreSystem scoreSystem;
 
+  final String localId;
   final int mapSeed;
   final VoidCallback? onReady;
   final Map<String, PlayerComponent> playerMap = {};
@@ -28,8 +29,22 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   bool _isSpaceFiring = false;
   double _fireAccumulator = 0;
 
-  GunArenaGame({int? mapSeed, this.onReady})
-      : mapSeed = mapSeed ?? Random().nextInt(999999);
+  bool get isLocalFiring => _isSpaceFiring;
+
+  static const List<Color> playerColorList = <Color>[
+    Color(0xFF4CAF50),
+    Color(0xFFF44336),
+    Color(0xFF2196F3),
+    Color(0xFFFF9800),
+  ];
+
+  static Color colorForPlayer(String playerId) {
+    return playerColorList[playerId.hashCode.abs() % playerColorList.length];
+  }
+
+  GunArenaGame({String? localId, int? mapSeed, this.onReady})
+      : localId = localId ?? 'local',
+        mapSeed = mapSeed ?? Random().nextInt(999999);
 
   @override
   Future<void> onLoad() async {
@@ -44,12 +59,12 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
 
     final Vector2 spawnPos = _findSafeSpawnPosition();
     localPlayer = PlayerComponent(
-      playerId: 'local',
+      playerId: localId,
       position: spawnPos,
-      color: const Color(0xFF4CAF50),
+      color: colorForPlayer(localId),
     );
     await world.add(localPlayer);
-    playerMap['local'] = localPlayer;
+    playerMap[localId] = localPlayer;
 
     camera.follow(localPlayer);
     onReady?.call();

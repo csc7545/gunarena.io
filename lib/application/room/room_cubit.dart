@@ -86,14 +86,20 @@ class RoomCubit extends Cubit<RoomState> {
       if (status == 'playing') {
         final RoomState currentState = state;
         if (currentState is RoomWaiting) {
-          emit(RoomStarting(roomId: currentState.roomId, isHost: currentState.isHost));
+          final int mapSeed = (data['mapSeed'] as num?)?.toInt() ?? 0;
+          emit(RoomStarting(
+            roomId: currentState.roomId,
+            isHost: currentState.isHost,
+            mapSeed: mapSeed,
+          ));
         }
       }
     });
   }
 
   Future<void> startGame() async {
-    await signaling.updateRoomStatus('playing');
+    final int seed = Random().nextInt(999999);
+    await signaling.updateRoomStatus('playing', mapSeed: seed);
   }
 
   Future<void> leaveRoom() async {

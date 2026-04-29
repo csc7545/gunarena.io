@@ -2,8 +2,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirebaseSignaling {
+  static const Duration _heartbeatInterval = Duration(seconds: 5);
+  static const Duration _staleThreshold = Duration(seconds: 15);
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final List<StreamSubscription<dynamic>> _subscriptionList = [];
+  Timer? _heartbeatTimer;
 
   String? _roomId;
   String? _localId;
@@ -30,8 +34,10 @@ class FirebaseSignaling {
       'name': hostName,
       'ready': true,
       'joinedAt': FieldValue.serverTimestamp(),
+      'lastSeen': FieldValue.serverTimestamp(),
     });
 
+    _startHeartbeat();
     return roomRef.id;
   }
 
@@ -53,6 +59,26 @@ class FirebaseSignaling {
       'name': playerName,
       'ready': true,
       'joinedAt': FieldValue.serverTimestamp(),
+      'lastSeen': FieldValue.serverTimestamp(),
+    });
+
+    _startHeartbeat();
+  }
+
+  void _startHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) async {
+      if (_roomId == null || _localId == null) return;
+      try {
+        await _firestore
+            .collection('rooms')
+            .doc(_roomId)
+            .collection('players')
+            .doc(_localId)
+            .update({'lastSeen': FieldValue.serverTimestamp()});
+      } catch (_) {
+        // Ignore transient failures; next tick will retry.
+      }
     });
   }
 
@@ -75,11 +101,19 @@ class FirebaseSignaling {
             .collection('players')
             .snapshots()
             .listen((QuerySnapshot<Map<String, dynamic>> snapshot) {
+      final DateTime now = DateTime.now();
       final List<Map<String, dynamic>> playerList = snapshot.docs
           .map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => {
                 'id': doc.id,
                 ...doc.data(),
               })
+          .where((Map<String, dynamic> p) {
+            // Always show local player so UI doesn't blink during own heartbeat.
+            if (p['id'] == _localId) return true;
+            final dynamic ts = p['lastSeen'];
+            if (ts is! Timestamp) return true;
+            return now.difference(ts.toDate()) < _staleThreshold;
+          })
           .toList();
       callback(playerList);
     });
@@ -140,11 +174,25 @@ class FirebaseSignaling {
   }
 
   // Update room status
-  Future<void> updateRoomStatus(String status) async {
+  Future<void> updateRoomStatus(String status, {int? mapSeed}) async {
     if (_roomId == null) return;
-    await _firestore.collection('rooms').doc(_roomId).update({
-      'status': status,
-    });
+    final Map<String, dynamic> updates = <String, dynamic>{'status': status};
+    if (mapSeed != null) updates['mapSeed'] = mapSeed;
+    await _firestore.collection('rooms').doc(_roomId).update(updates);
+  }
+
+  // Get all peer ids in the room except local player.
+  Future<List<String>> getPeerIds() async {
+    if (_roomId == null || _localId == null) return <String>[];
+    final QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+        .collection('rooms')
+        .doc(_roomId)
+        .collection('players')
+        .get();
+    return snapshot.docs
+        .where((QueryDocumentSnapshot<Map<String, dynamic>> d) => d.id != _localId)
+        .map((QueryDocumentSnapshot<Map<String, dynamic>> d) => d.id)
+        .toList();
   }
 
   // Listen for room status changes
@@ -187,6 +235,8 @@ class FirebaseSignaling {
 
   // Clean up all listeners
   void dispose() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     for (final StreamSubscription<dynamic> sub in _subscriptionList) {
       sub.cancel();
     }
