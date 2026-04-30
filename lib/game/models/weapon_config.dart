@@ -17,7 +17,7 @@ class WeaponConfig {
 
   static const WeaponConfig ar = WeaponConfig(
     damage: 15,
-    fireRate: 8.0,
+    fireRate: 3.0,
     bulletSpeed: 400.0,
     range: 300.0,
     magazineSize: 30,
