@@ -11,6 +11,7 @@ import 'package:gun_arena_io/game/components/impact_component.dart';
 import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/obstacle_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
+import 'package:gun_arena_io/game/input/local_input_controller.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
 import 'package:gun_arena_io/game/svg_sprites.dart';
 import 'package:gun_arena_io/game/systems/score_system.dart';
@@ -19,6 +20,7 @@ import 'package:gun_arena_io/game/systems/spawn_system.dart';
 class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents {
   late MapComponent mapComponent;
   late PlayerComponent localPlayer;
+  late LocalInputController localInput;
   late SpawnSystem spawnSystem;
   late ScoreSystem scoreSystem;
 
@@ -71,6 +73,8 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
       color: colorForPlayer(localId),
     );
     await world.add(localPlayer);
+    localInput = LocalInputController();
+    await localPlayer.add(localInput);
     playerMap[localId] = localPlayer;
 
     camera.follow(localPlayer);
@@ -87,7 +91,6 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   void _updateKeyboardInput(double dt) {
     if (gameEnded) return;
 
-    // WASD movement
     double dx = 0;
     double dy = 0;
     if (pressedKeySet.contains(LogicalKeyboardKey.keyW) ||
@@ -106,15 +109,14 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
         pressedKeySet.contains(LogicalKeyboardKey.arrowRight)) {
       dx += 1;
     }
-    localPlayer.moveDirection = Vector2(dx, dy);
+    localInput.setMove(dx, dy);
 
-    // Space auto-fire
     if (_isSpaceFiring) {
       _fireAccumulator += dt;
       final double fireInterval = 1.0 / WeaponConfig.ar.fireRate;
       while (_fireAccumulator >= fireInterval) {
         _fireAccumulator -= fireInterval;
-        shootBullet(localPlayer);
+        localInput.fire();
       }
     }
   }
@@ -134,7 +136,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
         !_isSpaceFiring) {
       _isSpaceFiring = true;
       _fireAccumulator = 0;
-      shootBullet(localPlayer);
+      localInput.fire();
       return KeyEventResult.handled;
     }
     if (event is KeyUpEvent && event.logicalKey == LogicalKeyboardKey.space) {
@@ -217,17 +219,17 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
 
   void onJoystickMove(double dx, double dy) {
     if (gameEnded) return;
-    localPlayer.moveDirection = Vector2(dx, dy);
+    localInput.setMove(dx, dy);
   }
 
   void onFire() {
     if (gameEnded) return;
-    shootBullet(localPlayer);
+    localInput.fire();
   }
 
   void onReload() {
     if (gameEnded) return;
-    localPlayer.startReload();
+    localInput.reload();
   }
 
   void onPlayerKill(String killerId, String victimId) {
