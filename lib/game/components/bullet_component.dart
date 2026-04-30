@@ -1,6 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:gun_arena_io/game/components/impact_component.dart';
@@ -9,25 +6,10 @@ import 'package:gun_arena_io/game/components/obstacle_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
-import 'package:gun_arena_io/game/svg_sprites.dart';
+import 'package:gun_arena_io/game/rendering/bullet_renderer.dart';
 
 class BulletComponent extends PositionComponent with CollisionCallbacks {
   static const double bulletRadius = 3.0;
-  static const double visualSize = 28.0;
-  static const double frameDuration = 0.05;
-
-  static final Paint _paint = Paint();
-  static final Rect _srcRect = Rect.fromLTWH(
-    0,
-    0,
-    SvgSprites.bulletPx.toDouble(),
-    SvgSprites.bulletPx.toDouble(),
-  );
-  static final Rect _dstRect = Rect.fromCenter(
-    center: const Offset(bulletRadius, bulletRadius),
-    width: visualSize,
-    height: visualSize,
-  );
 
   final String ownerId;
   final Vector2 direction;
@@ -35,7 +17,6 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
   final int damage;
   final double maxRange;
   double traveledDistance = 0;
-  double _animClock = 0;
 
   BulletComponent({
     required this.ownerId,
@@ -51,19 +32,17 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
           position: position,
           size: Vector2.all(bulletRadius * 2),
           anchor: Anchor.center,
-        ) {
-    angle = atan2(direction.y, direction.x) + pi / 2;
-  }
+        );
 
   @override
   Future<void> onLoad() async {
     add(CircleHitbox());
+    await add(BulletRenderer());
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    _animClock += dt;
     final Vector2 movement = direction * speed * dt;
     position.add(movement);
     traveledDistance += movement.length;
@@ -76,17 +55,6 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
       _spawnImpact();
       removeFromParent();
     }
-  }
-
-  @override
-  void render(Canvas canvas) {
-    final Image img = SvgSprites.frameAt(
-      SvgSprites.bulletKeyList,
-      _animClock,
-      frameDuration,
-      loop: true,
-    );
-    canvas.drawImageRect(img, _srcRect, _dstRect, _paint);
   }
 
   void _spawnImpact() {
