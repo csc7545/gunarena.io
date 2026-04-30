@@ -3,14 +3,25 @@ import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 
 /// Game-Programming-Patterns style Command: a function-object that mutates
-/// a player. State is intentionally allowed (e.g. MoveCommand carries the
-/// direction); to avoid per-frame allocation, callers should hold a single
-/// scratch instance and call set...() before execute().
+/// a player.
+///
+/// **Mutable-scratch policy** — Move/Aim subclasses carry their data as
+/// non-final fields and are intended to be reused across frames by the
+/// caller (a single scratch instance per controller). This trades the
+/// classical Command pattern's queue/replay/serialize abilities for zero
+/// per-frame allocation, which matters at 60 fps.
+///
+/// As a consequence, mutable commands are **immediate-execute only**:
+///   - DO NOT queue them (next frame's `set()` overwrites the field).
+///   - DO NOT keep references for replay (same reason).
+///   - DO NOT send them over the network (serialize/use can race).
+/// Stateless commands (Fire/Reload) are `const` and free to share.
 abstract class PlayerCommand {
   const PlayerCommand();
   void execute(PlayerComponent player);
 }
 
+/// Mutable scratch — see PlayerCommand docs. Immediate-execute only.
 class MoveCommand extends PlayerCommand {
   double dx;
   double dy;
@@ -28,6 +39,7 @@ class MoveCommand extends PlayerCommand {
   }
 }
 
+/// Mutable scratch — see PlayerCommand docs. Immediate-execute only.
 class AimCommand extends PlayerCommand {
   double x;
   double y;
