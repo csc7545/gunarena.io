@@ -60,6 +60,7 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
         position.x > MapComponent.mapWidth ||
         position.y < 0 ||
         position.y > MapComponent.mapHeight) {
+      _spawnImpact();
       removeFromParent();
     }
   }

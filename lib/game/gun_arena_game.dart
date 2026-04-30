@@ -5,6 +5,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gun_arena_io/game/components/bullet_component.dart';
+import 'package:gun_arena_io/game/components/impact_component.dart';
 import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
@@ -188,15 +189,70 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
     player.consumeAmmo();
     player.triggerAttack();
 
-    final Vector2 bulletPos = player.position +
-        player.facingDirection.normalized() * PlayerComponent.playerRadius * 1.5;
+    final Vector2 facing = player.facingDirection.normalized();
+    final Vector2 bulletPos =
+        player.position + facing * PlayerComponent.playerRadius * 1.5;
+
+    final Vector2? blockedAt = _findSegmentBlocker(player.position, bulletPos);
+    if (blockedAt != null) {
+      world.add(ImpactComponent(position: blockedAt));
+      return;
+    }
 
     final BulletComponent bullet = BulletComponent(
       ownerId: player.playerId,
       position: bulletPos.clone(),
-      direction: player.facingDirection.normalized(),
+      direction: facing,
     );
     world.add(bullet);
+  }
+
+  Vector2? _findSegmentBlocker(Vector2 from, Vector2 to) {
+    Vector2? closest;
+    double minT = double.infinity;
+    for (final Rect rect in mapComponent.obstacleRectList) {
+      final double? t = _segmentAabbT(from, to, rect);
+      if (t != null && t < minT) {
+        minT = t;
+        closest = from + (to - from) * t;
+      }
+    }
+    return closest;
+  }
+
+  // Returns the [0, 1] parameter t at which segment from→to enters rect, or
+  // null if no intersection. If `from` is already inside, returns 0.
+  double? _segmentAabbT(Vector2 from, Vector2 to, Rect rect) {
+    final double dx = to.x - from.x;
+    final double dy = to.y - from.y;
+    double tMin = 0.0;
+    double tMax = 1.0;
+
+    if (dx.abs() < 1e-9) {
+      if (from.x < rect.left || from.x > rect.right) return null;
+    } else {
+      final double t1 = (rect.left - from.x) / dx;
+      final double t2 = (rect.right - from.x) / dx;
+      final double tEnter = t1 < t2 ? t1 : t2;
+      final double tExit = t1 < t2 ? t2 : t1;
+      if (tEnter > tMin) tMin = tEnter;
+      if (tExit < tMax) tMax = tExit;
+      if (tMin > tMax) return null;
+    }
+
+    if (dy.abs() < 1e-9) {
+      if (from.y < rect.top || from.y > rect.bottom) return null;
+    } else {
+      final double t1 = (rect.top - from.y) / dy;
+      final double t2 = (rect.bottom - from.y) / dy;
+      final double tEnter = t1 < t2 ? t1 : t2;
+      final double tExit = t1 < t2 ? t2 : t1;
+      if (tEnter > tMin) tMin = tEnter;
+      if (tExit < tMax) tMax = tExit;
+      if (tMin > tMax) return null;
+    }
+
+    return tMin;
   }
 
   void onJoystickMove(double dx, double dy) {
