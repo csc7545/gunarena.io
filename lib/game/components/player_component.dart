@@ -28,6 +28,11 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   Vector2 moveDirection = Vector2.zero();
   Vector2 facingDirection = Vector2(1, 0);
 
+  // Per-instance scratch to avoid per-frame Vector2 allocation in the
+  // movement hot path. NEVER make this static — concurrent update() of
+  // sibling instances would clobber it.
+  final Vector2 _moveScratch = Vector2.zero();
+
   int _attackCounter = 0;
   int get attackCounter => _attackCounter;
 
@@ -68,13 +73,15 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
     }
 
     if (!moveDirection.isZero()) {
-      final Vector2 normalized = moveDirection.normalized();
-      facingDirection.setFrom(normalized);
-      final Vector2 movement = normalized * playerSpeed * dt;
-      final Vector2 newPos = position + movement;
-      newPos.x = newPos.x.clamp(playerRadius, MapComponent.mapWidth - playerRadius);
-      newPos.y = newPos.y.clamp(playerRadius, MapComponent.mapHeight - playerRadius);
-      position.setFrom(newPos);
+      _moveScratch
+        ..setFrom(moveDirection)
+        ..normalize();
+      facingDirection.setFrom(_moveScratch);
+      position.addScaled(_moveScratch, playerSpeed * dt);
+      position.x = position.x
+          .clamp(playerRadius, MapComponent.mapWidth - playerRadius);
+      position.y = position.y
+          .clamp(playerRadius, MapComponent.mapHeight - playerRadius);
     }
   }
 

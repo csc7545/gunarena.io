@@ -8,6 +8,9 @@ class AiPlayerComponent extends PlayerComponent
     with HasGameReference<GunArenaGame> {
   final Random _random = Random();
 
+  // Per-instance scratch for aim direction. NEVER static.
+  final Vector2 _dirScratch = Vector2.zero();
+
   double _directionChangeTimer = 0;
   double _nextDirectionChange = 1.0;
   double _shootCooldown = 0;
@@ -36,7 +39,7 @@ class AiPlayerComponent extends PlayerComponent
       _nextDirectionChange = 1.0 + _random.nextDouble() * 2.0;
 
       final double angle = _random.nextDouble() * 2 * pi;
-      moveDirection = Vector2(cos(angle), sin(angle));
+      moveDirection.setValues(cos(angle), sin(angle));
     }
   }
 
@@ -46,12 +49,15 @@ class AiPlayerComponent extends PlayerComponent
     final PlayerComponent? target = _findNearestAlivePlayer();
     if (target == null) return;
 
-    final Vector2 dirToTarget =
-        (target.position - position).normalized();
+    _dirScratch
+      ..setFrom(target.position)
+      ..sub(position);
+    if (_dirScratch.length2 == 0) return;
+    _dirScratch.normalize();
 
-    facingDirection.setFrom(dirToTarget);
+    facingDirection.setFrom(_dirScratch);
 
-    if (_isAimingAt(dirToTarget) && _shootCooldown <= 0 && canShoot()) {
+    if (_isAimingAt(_dirScratch) && _shootCooldown <= 0 && canShoot()) {
       game.shootBullet(this);
       _shootCooldown = 0.3;
     }
@@ -80,11 +86,13 @@ class AiPlayerComponent extends PlayerComponent
 
   bool _isAimingAt(Vector2 dirToTarget) {
     if (facingDirection.isZero() || dirToTarget.isZero()) return false;
-
-    final double dot = facingDirection.normalized().dot(dirToTarget.normalized());
-    final double clampedDot = dot.clamp(-1.0, 1.0);
-    final double angleDeg = acos(clampedDot) * 180 / pi;
-
+    // Both vectors are guaranteed unit length here:
+    //   - facingDirection is set from a normalized scratch in Player.update or
+    //     from this method's _dirScratch (already normalized).
+    //   - dirToTarget == _dirScratch, normalized just above the call site.
+    final double dot =
+        facingDirection.dot(dirToTarget).clamp(-1.0, 1.0);
+    final double angleDeg = acos(dot) * 180 / pi;
     return angleDeg <= 30;
   }
 }

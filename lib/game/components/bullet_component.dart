@@ -43,9 +43,10 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
   @override
   void update(double dt) {
     super.update(dt);
-    final Vector2 movement = direction * speed * dt;
-    position.add(movement);
-    traveledDistance += movement.length;
+    // direction is unit vector (set at construction), so |direction*step| = step.
+    final double step = speed * dt;
+    position.addScaled(direction, step);
+    traveledDistance += step;
 
     if (traveledDistance >= maxRange ||
         position.x < 0 ||
