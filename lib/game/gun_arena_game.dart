@@ -36,6 +36,13 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   bool _isSpaceFiring = false;
   double _fireAccumulator = 0;
 
+  // Authority fire-rate gate. shootBullet() is the single chokepoint for
+  // every fire path (local input, network input, AI), so enforcing the
+  // weapon's fire interval here means a held Space on a client cannot
+  // shoot faster than weapon.fireRate even if the client streams
+  // firing=true at the network tick rate.
+  final Map<String, double> _lastFireTimeMap = {};
+
   bool get isLocalFiring => _isSpaceFiring;
 
   static const List<Color> playerColorList = <Color>[
@@ -191,6 +198,13 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
 
   void shootBullet(PlayerComponent player) {
     if (!player.canShoot() || gameEnded) return;
+
+    final double now = currentTime();
+    final double interval = 1.0 / WeaponConfig.ar.fireRate;
+    final double last = _lastFireTimeMap[player.playerId] ?? -interval;
+    if (now - last < interval) return;
+    _lastFireTimeMap[player.playerId] = now;
+
     player.consumeAmmo();
     player.triggerAttack();
 
