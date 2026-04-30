@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 40 40">
+  <!-- Fading glow -->
+  <circle cx="16" cy="16" r="5" fill="#FF6B1A" opacity="0.4"/>
+  <circle cx="16" cy="16" r="3" fill="#FFC233" opacity="0.5"/>
+  <!-- Dispersing smoke -->
+  <circle cx="16" cy="16" r="4" fill="#5A5A5A" opacity="0.55"/>
+  <circle cx="10" cy="12" r="3.5" fill="#7A7A7A" opacity="0.5"/>
+  <circle cx="22" cy="12" r="3.2" fill="#888" opacity="0.5"/>
+  <circle cx="10" cy="22" r="3" fill="#9A9A9A" opacity="0.45"/>
+  <circle cx="22" cy="22" r="3.5" fill="#7A7A7A" opacity="0.5"/>
+  <circle cx="16" cy="6" r="2.5" fill="#A5A5A5" opacity="0.4"/>
+  <circle cx="16" cy="26" r="2.5" fill="#A5A5A5" opacity="0.4"/>
+  <circle cx="6" cy="16" r="2.3" fill="#888" opacity="0.4"/>
+  <circle cx="26" cy="16" r="2.3" fill="#888" opacity="0.4"/>
+  <!-- Faint outer dust -->
+  <circle cx="16" cy="16" r="15" fill="none" stroke="#9A9A9A" stroke-width="0.5" opacity="0.25"/>
+</svg>

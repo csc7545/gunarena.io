@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 80 80">
+  <!-- Left track -->
+  <rect x="4" y="8" width="10" height="48" rx="2" fill="#2A2A2A"/>
+  <g stroke="#111" stroke-width="1">
+    <line x1="4" y1="14" x2="14" y2="14"/>
+    <line x1="4" y1="20" x2="14" y2="20"/>
+    <line x1="4" y1="26" x2="14" y2="26"/>
+    <line x1="4" y1="32" x2="14" y2="32"/>
+    <line x1="4" y1="38" x2="14" y2="38"/>
+    <line x1="4" y1="44" x2="14" y2="44"/>
+    <line x1="4" y1="50" x2="14" y2="50"/>
+  </g>
+  <!-- Right track -->
+  <rect x="50" y="8" width="10" height="48" rx="2" fill="#2A2A2A"/>
+  <g stroke="#111" stroke-width="1">
+    <line x1="50" y1="14" x2="60" y2="14"/>
+    <line x1="50" y1="20" x2="60" y2="20"/>
+    <line x1="50" y1="26" x2="60" y2="26"/>
+    <line x1="50" y1="32" x2="60" y2="32"/>
+    <line x1="50" y1="38" x2="60" y2="38"/>
+    <line x1="50" y1="44" x2="60" y2="44"/>
+    <line x1="50" y1="50" x2="60" y2="50"/>
+  </g>
+  <!-- Hull -->
+  <rect x="12" y="10" width="40" height="44" rx="3" fill="#4A5C2E" stroke="#2E3A1C" stroke-width="0.8"/>
+  <!-- Hull top highlight -->
+  <rect x="14" y="11" width="36" height="3" rx="1" fill="#5E7338" opacity="0.7"/>
+  <!-- Front armor plate line -->
+  <line x1="14" y1="18" x2="50" y2="18" stroke="#2E3A1C" stroke-width="0.6"/>
+  <!-- Rear vent -->
+  <rect x="22" y="48" width="20" height="3" fill="#2E3A1C"/>
+  <line x1="26" y1="48" x2="26" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="30" y1="48" x2="30" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="34" y1="48" x2="34" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="38" y1="48" x2="38" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <!-- Turret ring -->
+  <circle cx="32" cy="32" r="13" fill="#2E3A1C"/>
+  <!-- Turret -->
+  <rect x="22" y="22" width="20" height="20" rx="3" fill="#3F5026" stroke="#2E3A1C" stroke-width="0.6"/>
+  <!-- Turret highlight -->
+  <rect x="23.5" y="23.5" width="17" height="2" rx="1" fill="#536A35" opacity="0.7"/>
+  <!-- Barrel -->
+  <rect x="29.5" y="2" width="5" height="24" fill="#2A2A2A"/>
+  <rect x="29.5" y="2" width="5" height="2" fill="#111"/>
+  <!-- Barrel collar -->
+  <rect x="28" y="22" width="8" height="3" rx="1" fill="#1F1F1F"/>
+  <!-- Hatch -->
+  <circle cx="32" cy="34" r="3.2" fill="#2A2A2A"/>
+  <circle cx="32" cy="34" r="2" fill="#1A1A1A"/>
+  <!-- Antenna -->
+  <line x1="38" y1="26" x2="40" y2="20" stroke="#1A1A1A" stroke-width="0.8"/>
+  <circle cx="40" cy="20" r="0.8" fill="#1A1A1A"/>
+</svg>

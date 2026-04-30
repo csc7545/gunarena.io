@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 80 80">
+  <!-- Tracks (charred) -->
+  <rect x="4" y="8" width="10" height="48" rx="2" fill="#151515"/>
+  <g stroke="#050505" stroke-width="1">
+    <line x1="4" y1="14" x2="14" y2="14"/>
+    <line x1="4" y1="20" x2="14" y2="20"/>
+    <line x1="4" y1="26" x2="14" y2="26"/>
+    <line x1="4" y1="32" x2="14" y2="32"/>
+    <line x1="4" y1="38" x2="14" y2="38"/>
+    <line x1="4" y1="44" x2="14" y2="44"/>
+    <line x1="4" y1="50" x2="14" y2="50"/>
+  </g>
+  <rect x="50" y="8" width="10" height="48" rx="2" fill="#151515"/>
+  <g stroke="#050505" stroke-width="1">
+    <line x1="50" y1="14" x2="60" y2="14"/>
+    <line x1="50" y1="20" x2="60" y2="20"/>
+    <line x1="50" y1="26" x2="60" y2="26"/>
+    <line x1="50" y1="32" x2="60" y2="32"/>
+    <line x1="50" y1="38" x2="60" y2="38"/>
+    <line x1="50" y1="44" x2="60" y2="44"/>
+    <line x1="50" y1="50" x2="60" y2="50"/>
+  </g>
+  <!-- Hull (burned-out wreckage) -->
+  <rect x="12" y="10" width="40" height="44" rx="3" fill="#1A1F10" stroke="#050505" stroke-width="0.8"/>
+  <line x1="14" y1="18" x2="50" y2="18" stroke="#050505" stroke-width="0.6"/>
+  <rect x="22" y="48" width="20" height="3" fill="#050505"/>
+  <!-- Heavy cracks all over -->
+  <polyline points="14,22 22,28 16,36 24,42 18,50" stroke="#000" stroke-width="1.2" fill="none"/>
+  <polyline points="50,14 42,22 48,30 42,40 48,48" stroke="#000" stroke-width="1.2" fill="none"/>
+  <polyline points="32,10 28,18 34,26 28,34 34,42 30,50" stroke="#000" stroke-width="1" fill="none"/>
+  <polyline points="20,12 28,16 24,24" stroke="#000" stroke-width="0.8" fill="none"/>
+  <polyline points="44,12 38,18 44,24" stroke="#000" stroke-width="0.8" fill="none"/>
+  <!-- Heavy scorch marks -->
+  <circle cx="22" cy="24" r="5" fill="#000" opacity="0.85"/>
+  <circle cx="42" cy="38" r="4.5" fill="#000" opacity="0.85"/>
+  <circle cx="36" cy="14" r="3" fill="#000" opacity="0.8"/>
+  <circle cx="18" cy="44" r="3" fill="#000" opacity="0.8"/>
+  <circle cx="48" cy="22" r="2.5" fill="#000" opacity="0.7"/>
+  <!-- Turret (askew, dead) -->
+  <circle cx="32" cy="32" r="13" fill="#050505"/>
+  <g transform="rotate(35 32 32)">
+    <rect x="22" y="22" width="20" height="20" rx="3" fill="#151A0A" stroke="#000" stroke-width="0.8"/>
+    <rect x="29.5" y="2" width="5" height="24" fill="#050505"/>
+    <rect x="28" y="22" width="8" height="3" rx="1" fill="#000"/>
+    <!-- Open hatch (blown off) -->
+    <circle cx="32" cy="34" r="4" fill="#000"/>
+    <circle cx="32" cy="34" r="2.5" fill="#FF3A0A" opacity="0.6"/>
+  </g>
+  <!-- Faint embers -->
+  <circle cx="22" cy="24" r="1.2" fill="#FF6B1A" opacity="0.7"/>
+  <circle cx="42" cy="38" r="1" fill="#FFC233" opacity="0.6"/>
+  <circle cx="32" cy="32" r="1.5" fill="#FF3A0A" opacity="0.5"/>
+  <!-- Heavy smoke plumes -->
+  <circle cx="20" cy="8" r="5" fill="#3A3A3A" opacity="0.55"/>
+  <circle cx="26" cy="4" r="4" fill="#5A5A5A" opacity="0.5"/>
+  <circle cx="32" cy="6" r="6" fill="#2A2A2A" opacity="0.55"/>
+  <circle cx="40" cy="3" r="4.5" fill="#4A4A4A" opacity="0.5"/>
+  <circle cx="46" cy="8" r="4" fill="#3A3A3A" opacity="0.55"/>
+  <circle cx="14" cy="14" r="3" fill="#5A5A5A" opacity="0.45"/>
+  <circle cx="52" cy="14" r="3.5" fill="#4A4A4A" opacity="0.45"/>
+</svg>

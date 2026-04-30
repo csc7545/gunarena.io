@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/collisions.dart';
@@ -5,11 +6,17 @@ import 'package:flame/components.dart';
 import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/obstacle_component.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
+import 'package:gun_arena_io/game/svg_sprites.dart';
 
 class PlayerComponent extends PositionComponent with CollisionCallbacks {
   static const double playerSpeed = 200.0;
   static const double playerRadius = 16.0;
+  static const double visualSize = 56.0;
   static const int maxHp = 100;
+
+  static const double idleFrameDuration = 0.4;
+  static const double attackFrameDuration = 0.04;
+  static const double dieFrameDuration = 0.2;
 
   final String playerId;
   final Color color;
@@ -26,6 +33,11 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
 
   Vector2 moveDirection = Vector2.zero();
   Vector2 facingDirection = Vector2(1, 0);
+
+  double _idleClock = 0;
+  double _attackElapsed = 0;
+  bool _isAttacking = false;
+  double _dieElapsed = 0;
 
   PlayerComponent({
     required this.playerId,
@@ -46,7 +58,11 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    if (!alive) return;
+    if (!alive) {
+      _dieElapsed = (_dieElapsed + dt)
+          .clamp(0.0, dieFrameDuration * SvgSprites.tankDieKeyList.length - 0.001);
+      return;
+    }
 
     // Invincibility timer
     if (isInvincible) {
@@ -65,6 +81,17 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       }
     }
 
+    // Animation clocks
+    if (_isAttacking) {
+      _attackElapsed += dt;
+      if (_attackElapsed >=
+          attackFrameDuration * SvgSprites.tankAttackKeyList.length) {
+        _isAttacking = false;
+      }
+    } else {
+      _idleClock += dt;
+    }
+
     // Movement
     if (!moveDirection.isZero()) {
       final Vector2 normalized = moveDirection.normalized();
@@ -77,38 +104,55 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
 
       position.setFrom(newPos);
     }
+
+    // Sync sprite rotation to facing direction.
+    // SVG tank faces -y (up). Default Flame angle 0 = unrotated SVG.
+    // facing (1,0) → angle = pi/2 (rotate so barrel points +x).
+    angle = atan2(facingDirection.y, facingDirection.x) + pi / 2;
   }
 
   @override
   void render(Canvas canvas) {
+    final String key = _currentSpriteKey();
+    final Image img = SvgSprites.image(key);
+
+    final double alpha = isInvincible
+        ? (invincibleTimer * 5 % 1 > 0.5 ? 0.3 : 0.8)
+        : 1.0;
+
+    final Paint paint = Paint()
+      ..colorFilter = ColorFilter.mode(
+        color.withValues(alpha: alpha),
+        BlendMode.modulate,
+      );
+
+    final Rect srcRect = Rect.fromLTWH(
+      0,
+      0,
+      img.width.toDouble(),
+      img.height.toDouble(),
+    );
+    final Rect dstRect = Rect.fromCenter(
+      center: Offset(size.x / 2, size.y / 2),
+      width: visualSize,
+      height: visualSize,
+    );
+    canvas.drawImageRect(img, srcRect, dstRect, paint);
+
     if (!alive) return;
 
-    final Paint bodyPaint = Paint()
-      ..color = isInvincible
-          ? color.withValues(alpha: (invincibleTimer * 5 % 1 > 0.5 ? 0.3 : 0.8))
-          : color;
-
-    canvas.drawCircle(
-      Offset(playerRadius, playerRadius),
-      playerRadius,
-      bodyPaint,
-    );
-
-    // Direction indicator
-    final Paint dirPaint = Paint()
-      ..color = const Color(0xFFFFFFFF)
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.round;
-
-    final Offset center = Offset(playerRadius, playerRadius);
-    final Offset dirEnd = center +
-        Offset(facingDirection.x, facingDirection.y) * playerRadius * 0.8;
-    canvas.drawLine(center, dirEnd, dirPaint);
-
-    // HP bar
+    // HP bar (drawn unrotated by reversing parent rotation locally is complex;
+    // for top-down feel we render in component-local space — bar will rotate.
+    // Acceptable for this prototype; can be moved to a HUD overlay later.)
     final double hpBarWidth = playerRadius * 2;
     final double hpPercent = hp / maxHp;
     final double hpBarY = -8.0;
+
+    canvas.save();
+    // Counter-rotate so the HP bar stays screen-aligned regardless of facing.
+    canvas.translate(size.x / 2, size.y / 2);
+    canvas.rotate(-angle);
+    canvas.translate(-hpBarWidth / 2, -size.y / 2);
 
     canvas.drawRect(
       Rect.fromLTWH(0, hpBarY, hpBarWidth, 4),
@@ -123,6 +167,30 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
                 ? const Color(0xFFFFC107)
                 : const Color(0xFFF44336),
     );
+    canvas.restore();
+  }
+
+  String _currentSpriteKey() {
+    if (!alive) {
+      final int idx = (_dieElapsed / dieFrameDuration)
+          .floor()
+          .clamp(0, SvgSprites.tankDieKeyList.length - 1);
+      return SvgSprites.tankDieKeyList[idx];
+    }
+    if (_isAttacking) {
+      final int idx = (_attackElapsed / attackFrameDuration)
+          .floor()
+          .clamp(0, SvgSprites.tankAttackKeyList.length - 1);
+      return SvgSprites.tankAttackKeyList[idx];
+    }
+    final int idx = (_idleClock / idleFrameDuration).floor() %
+        SvgSprites.tankIdleKeyList.length;
+    return SvgSprites.tankIdleKeyList[idx];
+  }
+
+  void triggerAttack() {
+    _isAttacking = true;
+    _attackElapsed = 0;
   }
 
   void takeDamage(int damage) {
@@ -135,8 +203,11 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   }
 
   void die() {
+    if (!alive) return;
     alive = false;
     deaths++;
+    _dieElapsed = 0;
+    _isAttacking = false;
   }
 
   void respawn(Vector2 pos) {
@@ -147,6 +218,9 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
     isReloading = false;
     isInvincible = true;
     invincibleTimer = 2.0;
+    _isAttacking = false;
+    _attackElapsed = 0;
+    _dieElapsed = 0;
   }
 
   void startReload() {

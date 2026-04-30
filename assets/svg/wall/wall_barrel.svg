@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Drop shadow -->
+  <ellipse cx="33" cy="34" rx="29" ry="29" fill="#000" opacity="0.3"/>
+  <!-- Outer ring (rim) -->
+  <circle cx="32" cy="32" r="28" fill="#3A2A1A"/>
+  <!-- Main body (red drum) -->
+  <circle cx="32" cy="32" r="26" fill="#A03020"/>
+  <!-- Top inner ring (rib) -->
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#6F1F18" stroke-width="1.5"/>
+  <!-- Mid rib -->
+  <circle cx="32" cy="32" r="16" fill="none" stroke="#6F1F18" stroke-width="1"/>
+  <!-- Inner rib -->
+  <circle cx="32" cy="32" r="10" fill="none" stroke="#6F1F18" stroke-width="0.8"/>
+  <!-- Highlight (top-left arc, light source from top-left) -->
+  <path d="M 10 28 A 22 22 0 0 1 32 10" fill="none" stroke="#D45A40" stroke-width="2" opacity="0.7"/>
+  <path d="M 14 24 A 18 18 0 0 1 32 14" fill="none" stroke="#E0705A" stroke-width="1.2" opacity="0.5"/>
+  <!-- Shadow (bottom-right arc) -->
+  <path d="M 32 54 A 22 22 0 0 1 54 32" fill="none" stroke="#5A1810" stroke-width="2" opacity="0.6"/>
+  <!-- Top cap -->
+  <circle cx="32" cy="32" r="5" fill="#3A2A1A"/>
+  <circle cx="32" cy="32" r="4" fill="#5A4A2A"/>
+  <!-- Center bolt -->
+  <circle cx="32" cy="32" r="1.5" fill="#1A1A1A"/>
+  <!-- Hazard warning stripe (yellow band, top-right area) -->
+  <path d="M 38 12 L 50 18 L 52 22 L 40 16 Z" fill="#FFC233"/>
+  <path d="M 39 13 L 49 18 L 51 21 L 41 17 Z" fill="#000" opacity="0.4"/>
+  <!-- Small dent/scratch -->
+  <line x1="20" y1="44" x2="26" y2="46" stroke="#3A1010" stroke-width="0.6"/>
+</svg>

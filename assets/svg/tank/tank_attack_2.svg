@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 80 80">
+  <!-- Tracks -->
+  <rect x="4" y="8" width="10" height="48" rx="2" fill="#2A2A2A"/>
+  <g stroke="#111" stroke-width="1">
+    <line x1="4" y1="14" x2="14" y2="14"/>
+    <line x1="4" y1="20" x2="14" y2="20"/>
+    <line x1="4" y1="26" x2="14" y2="26"/>
+    <line x1="4" y1="32" x2="14" y2="32"/>
+    <line x1="4" y1="38" x2="14" y2="38"/>
+    <line x1="4" y1="44" x2="14" y2="44"/>
+    <line x1="4" y1="50" x2="14" y2="50"/>
+  </g>
+  <rect x="50" y="8" width="10" height="48" rx="2" fill="#2A2A2A"/>
+  <g stroke="#111" stroke-width="1">
+    <line x1="50" y1="14" x2="60" y2="14"/>
+    <line x1="50" y1="20" x2="60" y2="20"/>
+    <line x1="50" y1="26" x2="60" y2="26"/>
+    <line x1="50" y1="32" x2="60" y2="32"/>
+    <line x1="50" y1="38" x2="60" y2="38"/>
+    <line x1="50" y1="44" x2="60" y2="44"/>
+    <line x1="50" y1="50" x2="60" y2="50"/>
+  </g>
+  <!-- Hull -->
+  <rect x="12" y="10" width="40" height="44" rx="3" fill="#4A5C2E" stroke="#2E3A1C" stroke-width="0.8"/>
+  <rect x="14" y="11" width="36" height="3" rx="1" fill="#5E7338" opacity="0.7"/>
+  <line x1="14" y1="18" x2="50" y2="18" stroke="#2E3A1C" stroke-width="0.6"/>
+  <rect x="22" y="48" width="20" height="3" fill="#2E3A1C"/>
+  <line x1="26" y1="48" x2="26" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="30" y1="48" x2="30" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="34" y1="48" x2="34" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <line x1="38" y1="48" x2="38" y2="51" stroke="#1A1A1A" stroke-width="0.6"/>
+  <!-- Turret (max recoil 2px) -->
+  <circle cx="32" cy="34" r="13" fill="#2E3A1C"/>
+  <rect x="22" y="24" width="20" height="20" rx="3" fill="#3F5026" stroke="#2E3A1C" stroke-width="0.6"/>
+  <rect x="23.5" y="25.5" width="17" height="2" rx="1" fill="#536A35" opacity="0.7"/>
+  <!-- Barrel (max recoil 4px) -->
+  <rect x="29.5" y="6" width="5" height="24" fill="#2A2A2A"/>
+  <rect x="29.5" y="6" width="5" height="2" fill="#111"/>
+  <rect x="28" y="26" width="8" height="3" rx="1" fill="#1F1F1F"/>
+  <!-- Hatch -->
+  <circle cx="32" cy="36" r="3.2" fill="#2A2A2A"/>
+  <circle cx="32" cy="36" r="2" fill="#1A1A1A"/>
+  <!-- Antenna -->
+  <line x1="38" y1="28" x2="40" y2="22" stroke="#1A1A1A" stroke-width="0.8"/>
+  <circle cx="40" cy="22" r="0.8" fill="#1A1A1A"/>
+  <!-- Big muzzle flash -->
+  <circle cx="32" cy="2" r="7" fill="#FF6B1A" opacity="0.85"/>
+  <circle cx="32" cy="3" r="5" fill="#FFC233" opacity="0.95"/>
+  <circle cx="32" cy="4" r="3" fill="#FFF3A8"/>
+  <polygon points="32,-6 26,4 28,2 22,5 27,7 20,9 28,9 24,14 30,11 28,16 32,12 36,16 34,11 40,14 36,9 44,9 37,7 42,5 36,2 38,4" fill="#FF6B1A" opacity="0.7"/>
+  <polygon points="32,-3 28,5 30,4 25,8 30,7 27,11 32,9 37,11 34,7 39,8 34,4 36,5" fill="#FFC233"/>
+  <!-- Smoke ring -->
+  <circle cx="32" cy="3" r="9" fill="none" stroke="#FFE066" stroke-width="0.6" opacity="0.5"/>
+</svg>

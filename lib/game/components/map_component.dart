@@ -1,8 +1,10 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:gun_arena_io/game/components/obstacle_component.dart';
+import 'package:gun_arena_io/game/svg_sprites.dart';
 
 class MapComponent extends Component {
   static const double mapWidth = 1920.0;
@@ -31,19 +33,39 @@ class MapComponent extends Component {
       final Rect rect = Rect.fromLTWH(x, y, width, height);
       obstacleRectList.add(rect);
 
+      final double aspect = width / height;
+      final bool roundOk = aspect > 0.7 && aspect < 1.45;
+      final List<String> options = roundOk
+          ? SvgSprites.wallKeyList
+          : const ['wall_concrete', 'wall_sandbag', 'wall_crate'];
+      final String variant = options[random.nextInt(options.length)];
+
       add(ObstacleComponent(
         position: Vector2(x, y),
         size: Vector2(width, height),
+        spriteKey: variant,
       ));
     }
   }
 
   @override
   void render(Canvas canvas) {
-    // Map background
+    // Tiled ground texture
+    final Image groundImg = SvgSprites.image(SvgSprites.groundKey);
+    final Float64List identity = Float64List(16)
+      ..[0] = 1.0
+      ..[5] = 1.0
+      ..[10] = 1.0
+      ..[15] = 1.0;
+    final ImageShader shader = ImageShader(
+      groundImg,
+      TileMode.repeated,
+      TileMode.repeated,
+      identity,
+    );
     canvas.drawRect(
       const Rect.fromLTWH(0, 0, mapWidth, mapHeight),
-      Paint()..color = const Color(0xFF2D2D2D),
+      Paint()..shader = shader,
     );
 
     // Map border
@@ -54,17 +76,5 @@ class MapComponent extends Component {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0,
     );
-
-    // Grid lines
-    final Paint gridPaint = Paint()
-      ..color = const Color(0xFF3A3A3A)
-      ..strokeWidth = 0.5;
-
-    for (double x = 0; x <= mapWidth; x += 64) {
-      canvas.drawLine(Offset(x, 0), Offset(x, mapHeight), gridPaint);
-    }
-    for (double y = 0; y <= mapHeight; y += 64) {
-      canvas.drawLine(Offset(0, y), Offset(mapWidth, y), gridPaint);
-    }
   }
 }

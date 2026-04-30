@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -8 80 80">
+  <!-- Tracks -->
+  <rect x="4" y="8" width="10" height="48" rx="2" fill="#1F1F1F"/>
+  <g stroke="#0A0A0A" stroke-width="1">
+    <line x1="4" y1="14" x2="14" y2="14"/>
+    <line x1="4" y1="20" x2="14" y2="20"/>
+    <line x1="4" y1="26" x2="14" y2="26"/>
+    <line x1="4" y1="32" x2="14" y2="32"/>
+    <line x1="4" y1="38" x2="14" y2="38"/>
+    <line x1="4" y1="44" x2="14" y2="44"/>
+    <line x1="4" y1="50" x2="14" y2="50"/>
+  </g>
+  <rect x="50" y="8" width="10" height="48" rx="2" fill="#1F1F1F"/>
+  <g stroke="#0A0A0A" stroke-width="1">
+    <line x1="50" y1="14" x2="60" y2="14"/>
+    <line x1="50" y1="20" x2="60" y2="20"/>
+    <line x1="50" y1="26" x2="60" y2="26"/>
+    <line x1="50" y1="32" x2="60" y2="32"/>
+    <line x1="50" y1="38" x2="60" y2="38"/>
+    <line x1="50" y1="44" x2="60" y2="44"/>
+    <line x1="50" y1="50" x2="60" y2="50"/>
+  </g>
+  <!-- Hull (charred) -->
+  <rect x="12" y="10" width="40" height="44" rx="3" fill="#2A3318" stroke="#0F1208" stroke-width="0.8"/>
+  <line x1="14" y1="18" x2="50" y2="18" stroke="#0F1208" stroke-width="0.6"/>
+  <rect x="22" y="48" width="20" height="3" fill="#0F1208"/>
+  <!-- More cracks -->
+  <polyline points="16,22 24,30 18,38 28,46" stroke="#0A0A0A" stroke-width="1" fill="none"/>
+  <polyline points="48,14 40,22 50,32 42,44" stroke="#0A0A0A" stroke-width="1" fill="none"/>
+  <polyline points="32,10 30,20 36,28 30,40" stroke="#0A0A0A" stroke-width="0.8" fill="none"/>
+  <!-- Scorch marks -->
+  <circle cx="20" cy="22" r="4" fill="#0A0A0A" opacity="0.7"/>
+  <circle cx="44" cy="40" r="3.5" fill="#0A0A0A" opacity="0.7"/>
+  <circle cx="36" cy="14" r="2.5" fill="#0A0A0A" opacity="0.6"/>
+  <!-- Turret (more tilted) -->
+  <circle cx="32" cy="32" r="13" fill="#0F1208"/>
+  <g transform="rotate(18 32 32)">
+    <rect x="22" y="22" width="20" height="20" rx="3" fill="#1F2710" stroke="#0F1208" stroke-width="0.6"/>
+    <rect x="29.5" y="2" width="5" height="24" fill="#0F0F0F"/>
+    <rect x="28" y="22" width="8" height="3" rx="1" fill="#050505"/>
+    <circle cx="32" cy="34" r="3.5" fill="#0A0A0A"/>
+  </g>
+  <!-- BIG explosion -->
+  <circle cx="32" cy="32" r="22" fill="#FF3A0A" opacity="0.7"/>
+  <circle cx="32" cy="32" r="16" fill="#FF6B1A" opacity="0.85"/>
+  <circle cx="32" cy="32" r="11" fill="#FFC233" opacity="0.95"/>
+  <circle cx="32" cy="32" r="6" fill="#FFF3A8"/>
+  <!-- Explosion shards -->
+  <polygon points="32,4 28,18 32,14 36,18" fill="#FFC233" opacity="0.9"/>
+  <polygon points="60,32 46,28 50,32 46,36" fill="#FFC233" opacity="0.9"/>
+  <polygon points="32,60 36,46 32,50 28,46" fill="#FFC233" opacity="0.9"/>
+  <polygon points="4,32 18,36 14,32 18,28" fill="#FFC233" opacity="0.9"/>
+  <polygon points="50,12 44,22 48,20" fill="#FF6B1A" opacity="0.8"/>
+  <polygon points="14,12 22,20 18,16" fill="#FF6B1A" opacity="0.8"/>
+  <polygon points="50,52 44,44 48,46" fill="#FF6B1A" opacity="0.8"/>
+  <polygon points="14,52 22,44 18,48" fill="#FF6B1A" opacity="0.8"/>
+  <!-- Smoke ring -->
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#5A5A5A" stroke-width="1.5" opacity="0.4"/>
+</svg>

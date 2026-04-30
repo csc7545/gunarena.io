@@ -8,6 +8,7 @@ import 'package:gun_arena_io/game/components/bullet_component.dart';
 import 'package:gun_arena_io/game/components/map_component.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/models/weapon_config.dart';
+import 'package:gun_arena_io/game/svg_sprites.dart';
 import 'package:gun_arena_io/game/systems/score_system.dart';
 import 'package:gun_arena_io/game/systems/spawn_system.dart';
 
@@ -48,6 +49,8 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
 
   @override
   Future<void> onLoad() async {
+    await SvgSprites.loadAll();
+
     mapComponent = MapComponent(seed: mapSeed);
     await world.add(mapComponent);
 
@@ -183,6 +186,7 @@ class GunArenaGame extends FlameGame with HasCollisionDetection, KeyboardEvents 
   void shootBullet(PlayerComponent player) {
     if (!player.canShoot() || gameEnded) return;
     player.consumeAmmo();
+    player.triggerAttack();
 
     final Vector2 bulletPos = player.position +
         player.facingDirection.normalized() * PlayerComponent.playerRadius * 1.5;
