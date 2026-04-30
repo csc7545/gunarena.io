@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/painting.dart' show Color;
@@ -33,8 +35,26 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   // sibling instances would clobber it.
   final Vector2 _moveScratch = Vector2.zero();
 
+  // Remote interpolation: when a player is host-authoritative and seen on
+  // a client, position/facing are smoothed toward host snapshots instead
+  // of locally simulated. Set via setRemoteTarget().
+  //
+  // dt-based smoothing: t = 1 - exp(-remoteSmoothing * dt). With smoothing
+  // 12 and 16ms frame, ~17%/frame; over the 50ms snapshot tick, ~45%
+  // reached. Tunable in 8~18 range — higher = snappier, lower = smoother.
+  bool isRemoteInterpolated = false;
+  static const double remoteSmoothing = 12.0;
+  final Vector2 _targetPosition = Vector2.zero();
+  final Vector2 _targetFacing = Vector2(1, 0);
+
   int _attackCounter = 0;
   int get attackCounter => _attackCounter;
+
+  void setRemoteTarget(double x, double y, double fx, double fy) {
+    isRemoteInterpolated = true;
+    _targetPosition.setValues(x, y);
+    _targetFacing.setValues(fx, fy);
+  }
 
   PlayerComponent({
     required this.playerId,
@@ -56,6 +76,21 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   void update(double dt) {
     super.update(dt);
     if (!alive) return;
+
+    if (isRemoteInterpolated) {
+      // Host-authoritative entity rendered on a client: skip local
+      // simulation and smoothly approach the snapshotted target.
+      // Timers (invincible/reload) are state-synced from host snapshots.
+      final double t = 1.0 - exp(-remoteSmoothing * dt);
+      position.x += (_targetPosition.x - position.x) * t;
+      position.y += (_targetPosition.y - position.y) * t;
+      facingDirection.x += (_targetFacing.x - facingDirection.x) * t;
+      facingDirection.y += (_targetFacing.y - facingDirection.y) * t;
+      if (facingDirection.length2 > 0) {
+        facingDirection.normalize();
+      }
+      return;
+    }
 
     if (isInvincible) {
       invincibleTimer -= dt;

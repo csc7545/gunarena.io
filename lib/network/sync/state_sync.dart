@@ -127,6 +127,8 @@ class StateSync {
       final String id = p['id'] as String;
       final double x = (p['x'] as num).toDouble();
       final double y = (p['y'] as num).toDouble();
+      final double fx = (p['fx'] as num).toDouble();
+      final double fy = (p['fy'] as num).toDouble();
 
       PlayerComponent? player = game.findPlayer(id);
 
@@ -140,7 +142,16 @@ class StateSync {
         game.addPlayer(player);
       }
 
-      player.position.setValues(x, y);
+      if (id == game.localId) {
+        // Authoritative reconcile for own avatar (rubber-banding tolerated
+        // at low latency; see Phase 5+ for client-side prediction).
+        player.position.setValues(x, y);
+        player.facingDirection.setValues(fx, fy);
+      } else {
+        // Remote avatar — let PlayerComponent.update lerp toward target.
+        player.setRemoteTarget(x, y, fx, fy);
+      }
+
       player.hp = p['hp'] as int;
       player.kills = p['k'] as int;
       player.deaths = p['d'] as int;
@@ -148,10 +159,6 @@ class StateSync {
       player.ammo = p['am'] as int;
       player.isReloading = p['rl'] as bool;
       player.isInvincible = p['iv'] as bool;
-      player.facingDirection.setValues(
-        (p['fx'] as num).toDouble(),
-        (p['fy'] as num).toDouble(),
-      );
     }
   }
 
