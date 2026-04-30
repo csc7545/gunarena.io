@@ -142,15 +142,15 @@ class StateSync {
         game.addPlayer(player);
       }
 
-      if (id == game.localId) {
-        // Authoritative reconcile for own avatar (rubber-banding tolerated
-        // at low latency; see Phase 5+ for client-side prediction).
-        player.position.setValues(x, y);
-        player.facingDirection.setValues(fx, fy);
-      } else {
-        // Remote avatar — let PlayerComponent.update lerp toward target.
-        player.setRemoteTarget(x, y, fx, fy);
-      }
+      // Treat ALL players (own avatar included) as host-authoritative on
+      // the client side: lerp toward the snapshot rather than snapping.
+      // Without this, the client's own avatar runs local 60fps simulation
+      // and gets reconciled to a ~RTT-old host position every 50ms, which
+      // looks like 20Hz stop-motion (and shakes the camera that follows).
+      // Cost: input → visible movement is delayed by ~RTT + lerp time.
+      // Phase 5+ can upgrade to client-side prediction (local sim +
+      // soft reconcile when diff small, hard snap when diff large).
+      player.setRemoteTarget(x, y, fx, fy);
 
       player.hp = p['hp'] as int;
       player.kills = p['k'] as int;
