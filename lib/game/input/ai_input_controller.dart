@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:gun_arena_io/game/components/player_component.dart';
 import 'package:gun_arena_io/game/gun_arena_game.dart';
 import 'package:gun_arena_io/game/input/command.dart';
+import 'package:gun_arena_io/game/models/weapon_config.dart';
 
 /// AI brain attached as a child of a [PlayerComponent]. Reads parent state
 /// each frame and emits Commands; doesn't mutate the player directly.
@@ -62,7 +63,9 @@ class AiInputController extends Component
         _shootCooldown <= 0 &&
         _player.canShoot()) {
       _fireCmd.execute(_player);
-      _shootCooldown = 0.3;
+      // Match weapon fire interval so AI's local throttle doesn't fight
+      // the authoritative cooldown gate in GunArenaGame.shootBullet.
+      _shootCooldown = 1.0 / WeaponConfig.ar.fireRate;
     }
 
     if (!_player.isReloading && _player.ammo <= 0) {
