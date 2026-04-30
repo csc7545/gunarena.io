@@ -5,7 +5,13 @@ import 'package:flame/components.dart';
 import 'package:gun_arena_io/game/svg_sprites.dart';
 
 class ObstacleComponent extends PositionComponent with CollisionCallbacks {
+  static final Paint _paint = Paint();
+
   final String spriteKey;
+
+  late final Image _image;
+  late final Rect _srcRect;
+  late final Rect _dstRect;
 
   ObstacleComponent({
     required Vector2 position,
@@ -16,18 +22,18 @@ class ObstacleComponent extends PositionComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     add(RectangleHitbox());
+    _image = SvgSprites.image(spriteKey);
+    _srcRect = Rect.fromLTWH(
+      0,
+      0,
+      _image.width.toDouble(),
+      _image.height.toDouble(),
+    );
+    _dstRect = Rect.fromLTWH(0, 0, size.x, size.y);
   }
 
   @override
   void render(Canvas canvas) {
-    final Image img = SvgSprites.image(spriteKey);
-    final Rect srcRect = Rect.fromLTWH(
-      0,
-      0,
-      img.width.toDouble(),
-      img.height.toDouble(),
-    );
-    final Rect dstRect = Rect.fromLTWH(0, 0, size.x, size.y);
-    canvas.drawImageRect(img, srcRect, dstRect, Paint());
+    canvas.drawImageRect(_image, _srcRect, _dstRect, _paint);
   }
 }

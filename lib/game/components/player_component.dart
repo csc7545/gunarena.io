@@ -18,6 +18,18 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   static const double attackFrameDuration = 0.04;
   static const double dieFrameDuration = 0.2;
 
+  static final Rect _spriteSrcRect = Rect.fromLTWH(
+    0,
+    0,
+    SvgSprites.tankPx.toDouble(),
+    SvgSprites.tankPx.toDouble(),
+  );
+
+  static final Paint _hpBgPaint = Paint()..color = const Color(0xFF333333);
+  static final Paint _hpGreenPaint = Paint()..color = const Color(0xFF4CAF50);
+  static final Paint _hpYellowPaint = Paint()..color = const Color(0xFFFFC107);
+  static final Paint _hpRedPaint = Paint()..color = const Color(0xFFF44336);
+
   final String playerId;
   final Color color;
 
@@ -39,6 +51,9 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   bool _isAttacking = false;
   double _dieElapsed = 0;
 
+  late final Paint _basePaint;
+  late final Rect _spriteDstRect;
+
   PlayerComponent({
     required this.playerId,
     required Vector2 position,
@@ -52,6 +67,13 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     add(CircleHitbox());
+    _basePaint = Paint()
+      ..colorFilter = ColorFilter.mode(color, BlendMode.modulate);
+    _spriteDstRect = Rect.fromCenter(
+      center: Offset(size.x / 2, size.y / 2),
+      width: visualSize,
+      height: visualSize,
+    );
   }
 
   @override
@@ -59,12 +81,13 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
     super.update(dt);
 
     if (!alive) {
-      _dieElapsed = (_dieElapsed + dt)
-          .clamp(0.0, dieFrameDuration * SvgSprites.tankDieKeyList.length - 0.001);
+      _dieElapsed = (_dieElapsed + dt).clamp(
+        0.0,
+        dieFrameDuration * SvgSprites.tankDieKeyList.length - 0.001,
+      );
       return;
     }
 
-    // Invincibility timer
     if (isInvincible) {
       invincibleTimer -= dt;
       if (invincibleTimer <= 0) {
@@ -72,7 +95,6 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       }
     }
 
-    // Reload timer
     if (isReloading) {
       reloadTimer -= dt;
       if (reloadTimer <= 0) {
@@ -81,7 +103,6 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       }
     }
 
-    // Animation clocks
     if (_isAttacking) {
       _attackElapsed += dt;
       if (_attackElapsed >=
@@ -92,7 +113,6 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       _idleClock += dt;
     }
 
-    // Movement
     if (!moveDirection.isZero()) {
       final Vector2 normalized = moveDirection.normalized();
       facingDirection.setFrom(normalized);
@@ -105,87 +125,76 @@ class PlayerComponent extends PositionComponent with CollisionCallbacks {
       position.setFrom(newPos);
     }
 
-    // Sync sprite rotation to facing direction.
-    // SVG tank faces -y (up). Default Flame angle 0 = unrotated SVG.
-    // facing (1,0) → angle = pi/2 (rotate so barrel points +x).
+    // SVG tank faces -y; default Flame angle 0 leaves it pointing up.
+    // Add pi/2 so facing (1,0) rotates the barrel to +x.
     angle = atan2(facingDirection.y, facingDirection.x) + pi / 2;
   }
 
   @override
   void render(Canvas canvas) {
-    final String key = _currentSpriteKey();
-    final Image img = SvgSprites.image(key);
-
-    final double alpha = isInvincible
-        ? (invincibleTimer * 5 % 1 > 0.5 ? 0.3 : 0.8)
-        : 1.0;
-
-    final Paint paint = Paint()
-      ..colorFilter = ColorFilter.mode(
-        color.withValues(alpha: alpha),
-        BlendMode.modulate,
-      );
-
-    final Rect srcRect = Rect.fromLTWH(
-      0,
-      0,
-      img.width.toDouble(),
-      img.height.toDouble(),
-    );
-    final Rect dstRect = Rect.fromCenter(
-      center: Offset(size.x / 2, size.y / 2),
-      width: visualSize,
-      height: visualSize,
-    );
-    canvas.drawImageRect(img, srcRect, dstRect, paint);
+    final Image img = _currentSpriteImage();
+    final Paint paint;
+    if (isInvincible) {
+      final double alpha = invincibleTimer * 5 % 1 > 0.5 ? 0.3 : 0.8;
+      paint = Paint()
+        ..colorFilter = ColorFilter.mode(
+          color.withValues(alpha: alpha),
+          BlendMode.modulate,
+        );
+    } else {
+      paint = _basePaint;
+    }
+    canvas.drawImageRect(img, _spriteSrcRect, _spriteDstRect, paint);
 
     if (!alive) return;
 
-    // HP bar (drawn unrotated by reversing parent rotation locally is complex;
-    // for top-down feel we render in component-local space — bar will rotate.
-    // Acceptable for this prototype; can be moved to a HUD overlay later.)
     final double hpBarWidth = playerRadius * 2;
     final double hpPercent = hp / maxHp;
-    final double hpBarY = -8.0;
+    const double hpBarY = -8.0;
 
-    canvas.save();
     // Counter-rotate so the HP bar stays screen-aligned regardless of facing.
+    canvas.save();
     canvas.translate(size.x / 2, size.y / 2);
     canvas.rotate(-angle);
     canvas.translate(-hpBarWidth / 2, -size.y / 2);
-
     canvas.drawRect(
       Rect.fromLTWH(0, hpBarY, hpBarWidth, 4),
-      Paint()..color = const Color(0xFF333333),
+      _hpBgPaint,
     );
     canvas.drawRect(
       Rect.fromLTWH(0, hpBarY, hpBarWidth * hpPercent, 4),
-      Paint()
-        ..color = hpPercent > 0.5
-            ? const Color(0xFF4CAF50)
-            : hpPercent > 0.25
-                ? const Color(0xFFFFC107)
-                : const Color(0xFFF44336),
+      _hpFillPaint(hpPercent),
     );
     canvas.restore();
   }
 
-  String _currentSpriteKey() {
+  static Paint _hpFillPaint(double pct) {
+    if (pct > 0.5) return _hpGreenPaint;
+    if (pct > 0.25) return _hpYellowPaint;
+    return _hpRedPaint;
+  }
+
+  Image _currentSpriteImage() {
     if (!alive) {
-      final int idx = (_dieElapsed / dieFrameDuration)
-          .floor()
-          .clamp(0, SvgSprites.tankDieKeyList.length - 1);
-      return SvgSprites.tankDieKeyList[idx];
+      return SvgSprites.frameAt(
+        SvgSprites.tankDieKeyList,
+        _dieElapsed,
+        dieFrameDuration,
+      );
     }
     if (_isAttacking) {
-      final int idx = (_attackElapsed / attackFrameDuration)
-          .floor()
-          .clamp(0, SvgSprites.tankAttackKeyList.length - 1);
-      return SvgSprites.tankAttackKeyList[idx];
+      return SvgSprites.frameAt(
+        SvgSprites.tankAttackKeyList,
+        _attackElapsed,
+        attackFrameDuration,
+      );
     }
-    final int idx = (_idleClock / idleFrameDuration).floor() %
-        SvgSprites.tankIdleKeyList.length;
-    return SvgSprites.tankIdleKeyList[idx];
+    return SvgSprites.frameAt(
+      SvgSprites.tankIdleKeyList,
+      _idleClock,
+      idleFrameDuration,
+      loop: true,
+    );
   }
 
   void triggerAttack() {

@@ -13,10 +13,31 @@ class MapComponent extends Component {
   final int seed;
   final List<Rect> obstacleRectList = [];
 
+  late final Paint _groundPaint;
+  late final Paint _borderPaint;
+
   MapComponent({required this.seed});
 
   @override
   Future<void> onLoad() async {
+    final Image groundImg = SvgSprites.image(SvgSprites.groundKey);
+    final Float64List identity = Float64List(16)
+      ..[0] = 1.0
+      ..[5] = 1.0
+      ..[10] = 1.0
+      ..[15] = 1.0;
+    _groundPaint = Paint()
+      ..shader = ImageShader(
+        groundImg,
+        TileMode.repeated,
+        TileMode.repeated,
+        identity,
+      );
+    _borderPaint = Paint()
+      ..color = const Color(0xFF555555)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
     _generateObstacles();
   }
 
@@ -35,9 +56,8 @@ class MapComponent extends Component {
 
       final double aspect = width / height;
       final bool roundOk = aspect > 0.7 && aspect < 1.45;
-      final List<String> options = roundOk
-          ? SvgSprites.wallKeyList
-          : const ['wall_concrete', 'wall_sandbag', 'wall_crate'];
+      final List<String> options =
+          roundOk ? SvgSprites.wallKeyList : SvgSprites.wallNonRoundKeyList;
       final String variant = options[random.nextInt(options.length)];
 
       add(ObstacleComponent(
@@ -50,31 +70,13 @@ class MapComponent extends Component {
 
   @override
   void render(Canvas canvas) {
-    // Tiled ground texture
-    final Image groundImg = SvgSprites.image(SvgSprites.groundKey);
-    final Float64List identity = Float64List(16)
-      ..[0] = 1.0
-      ..[5] = 1.0
-      ..[10] = 1.0
-      ..[15] = 1.0;
-    final ImageShader shader = ImageShader(
-      groundImg,
-      TileMode.repeated,
-      TileMode.repeated,
-      identity,
+    canvas.drawRect(
+      const Rect.fromLTWH(0, 0, mapWidth, mapHeight),
+      _groundPaint,
     );
     canvas.drawRect(
       const Rect.fromLTWH(0, 0, mapWidth, mapHeight),
-      Paint()..shader = shader,
-    );
-
-    // Map border
-    canvas.drawRect(
-      const Rect.fromLTWH(0, 0, mapWidth, mapHeight),
-      Paint()
-        ..color = const Color(0xFF555555)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0,
+      _borderPaint,
     );
   }
 }

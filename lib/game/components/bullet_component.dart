@@ -16,6 +16,19 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
   static const double visualSize = 28.0;
   static const double frameDuration = 0.05;
 
+  static final Paint _paint = Paint();
+  static final Rect _srcRect = Rect.fromLTWH(
+    0,
+    0,
+    SvgSprites.bulletPx.toDouble(),
+    SvgSprites.bulletPx.toDouble(),
+  );
+  static final Rect _dstRect = Rect.fromCenter(
+    center: const Offset(bulletRadius, bulletRadius),
+    width: visualSize,
+    height: visualSize,
+  );
+
   final String ownerId;
   final Vector2 direction;
   final double speed;
@@ -67,22 +80,13 @@ class BulletComponent extends PositionComponent with CollisionCallbacks {
 
   @override
   void render(Canvas canvas) {
-    final int idx = (_animClock / frameDuration).floor() %
-        SvgSprites.bulletKeyList.length;
-    final Image img = SvgSprites.image(SvgSprites.bulletKeyList[idx]);
-
-    final Rect srcRect = Rect.fromLTWH(
-      0,
-      0,
-      img.width.toDouble(),
-      img.height.toDouble(),
+    final Image img = SvgSprites.frameAt(
+      SvgSprites.bulletKeyList,
+      _animClock,
+      frameDuration,
+      loop: true,
     );
-    final Rect dstRect = Rect.fromCenter(
-      center: Offset(size.x / 2, size.y / 2),
-      width: visualSize,
-      height: visualSize,
-    );
-    canvas.drawImageRect(img, srcRect, dstRect, Paint());
+    canvas.drawImageRect(img, _srcRect, _dstRect, _paint);
   }
 
   void _spawnImpact() {

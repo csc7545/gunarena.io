@@ -35,6 +35,13 @@ class SvgSprites {
     'wall_barrel',
     'wall_crate',
   ];
+  // Variants safe for non-square (stretched) obstacles — drum is excluded
+  // because its round silhouette deforms badly.
+  static const List<String> wallNonRoundKeyList = [
+    'wall_concrete',
+    'wall_sandbag',
+    'wall_crate',
+  ];
   static const String groundKey = 'ground_concrete';
 
   static ui.Image image(String key) {
@@ -45,29 +52,37 @@ class SvgSprites {
     return img;
   }
 
+  /// Returns the current animation frame image for [keyList] given [elapsed]
+  /// time and [frameDuration]. When [loop] is false, the index clamps to the
+  /// last frame (useful for one-shot like attack/die). When true, it wraps.
+  static ui.Image frameAt(
+    List<String> keyList,
+    double elapsed,
+    double frameDuration, {
+    bool loop = false,
+  }) {
+    final int raw = (elapsed / frameDuration).floor();
+    final int idx =
+        loop ? raw % keyList.length : raw.clamp(0, keyList.length - 1);
+    return image(keyList[idx]);
+  }
+
   static Future<void> loadAll() async {
     if (_loaded) return;
 
-    for (final String key in tankIdleKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/tank/$key.svg', tankPx);
-    }
-    for (final String key in tankAttackKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/tank/$key.svg', tankPx);
-    }
-    for (final String key in tankDieKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/tank/$key.svg', tankPx);
-    }
-    for (final String key in bulletKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/bullet/$key.svg', bulletPx);
-    }
-    for (final String key in impactKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/impact/$key.svg', impactPx);
-    }
-    for (final String key in wallKeyList) {
-      _imageMap[key] = await _rasterize('assets/svg/wall/$key.svg', wallPx);
-    }
-    _imageMap[groundKey] =
-        await _rasterize('assets/svg/ground/$groundKey.svg', groundPx);
+    final List<_LoadJob> jobList = <_LoadJob>[
+      ...tankIdleKeyList.map((k) => _LoadJob(k, 'assets/svg/tank/$k.svg', tankPx)),
+      ...tankAttackKeyList.map((k) => _LoadJob(k, 'assets/svg/tank/$k.svg', tankPx)),
+      ...tankDieKeyList.map((k) => _LoadJob(k, 'assets/svg/tank/$k.svg', tankPx)),
+      ...bulletKeyList.map((k) => _LoadJob(k, 'assets/svg/bullet/$k.svg', bulletPx)),
+      ...impactKeyList.map((k) => _LoadJob(k, 'assets/svg/impact/$k.svg', impactPx)),
+      ...wallKeyList.map((k) => _LoadJob(k, 'assets/svg/wall/$k.svg', wallPx)),
+      _LoadJob(groundKey, 'assets/svg/ground/$groundKey.svg', groundPx),
+    ];
+
+    await Future.wait(jobList.map((job) async {
+      _imageMap[job.key] = await _rasterize(job.path, job.sizePx);
+    }));
 
     _loaded = true;
   }
@@ -91,4 +106,11 @@ class SvgSprites {
       picture.dispose();
     }
   }
+}
+
+class _LoadJob {
+  final String key;
+  final String path;
+  final int sizePx;
+  const _LoadJob(this.key, this.path, this.sizePx);
 }
